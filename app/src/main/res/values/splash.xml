@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Theme.name.Starting" parent="Theme.SplashScreen">
+        <item name="android:windowSplashScreenBackground" tools:targetApi="31">#273037</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ph_qr_code_bold</item>
+        <item name="postSplashScreenTheme">@android:style/Theme.Material.NoActionBar</item>
+    </style>
+</resources>

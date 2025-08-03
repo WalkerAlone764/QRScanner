@@ -53,3 +53,6 @@ val ColorScheme.Wifi: Color
     get() = PersianBlue
 val ColorScheme.WifiBackground: Color
     get() = PersianBlue.copy(0.1f)
+
+val ColorScheme.OnOverlay: Color
+    get() = PureWhite

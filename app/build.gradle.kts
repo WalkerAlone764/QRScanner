@@ -42,6 +42,7 @@ dependencies {
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
@@ -58,4 +59,14 @@ dependencies {
 
     //Splash Screen API
     implementation(libs.androidx.core.splashscreen)
+
+    //koin
+    implementation(libs.bundles.koin)
+
+    //camera X compose
+    implementation("androidx.camera:camera-core:1.4.2")
+    implementation("androidx.camera:camera-compose:1.5.0-beta02")
+    implementation("androidx.camera:camera-camera2:1.4.2")
+    implementation(libs.androidx.camera.lifecycle)
+
 }

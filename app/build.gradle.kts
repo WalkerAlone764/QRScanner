@@ -64,9 +64,9 @@ dependencies {
     implementation(libs.bundles.koin)
 
     //camera X compose
-    implementation("androidx.camera:camera-core:1.4.2")
-    implementation("androidx.camera:camera-compose:1.5.0-beta02")
-    implementation("androidx.camera:camera-camera2:1.4.2")
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.compose)
+    implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.lifecycle)
 
 }

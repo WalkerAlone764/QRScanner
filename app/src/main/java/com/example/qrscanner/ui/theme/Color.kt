@@ -29,6 +29,9 @@ val PersianBlue = Color(0xff1F44CD)
 val ColorScheme.success: Color
     get() = Shamrock
 
+val ColorScheme.onSuccess: Color
+    get() = Color.Black
+
 val ColorScheme.text: Color
     get() = PurpleHeart
 val ColorScheme.textBackground: Color
@@ -54,5 +57,5 @@ val ColorScheme.Wifi: Color
 val ColorScheme.WifiBackground: Color
     get() = PersianBlue.copy(0.1f)
 
-val ColorScheme.OnOverlay: Color
+val ColorScheme.onOverlay: Color
     get() = PureWhite

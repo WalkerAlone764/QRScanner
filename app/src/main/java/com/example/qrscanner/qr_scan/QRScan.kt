@@ -1,10 +1,17 @@
 package com.example.qrscanner.qr_scan
 
+import android.Manifest
+import android.app.Activity
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.provider.Settings
+import android.util.Log
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -22,6 +29,9 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.withStarted
+import com.example.qrscanner.core.presentation.components.ContentWithBottomMessageBar
+import com.example.qrscanner.core.presentation.util.ObserveAsEvents
+import com.example.qrscanner.qr_scan.components.CameraRationale
 import com.example.qrscanner.qr_scan.components.ViewFinderComponent
 import com.example.qrscanner.ui.theme.QRScannerTheme
 
@@ -38,10 +48,26 @@ fun QRScanRoot(
 
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
+    val activity = LocalActivity.current
 
     LaunchedEffect(lifecycleOwner) {
         lifecycleOwner.lifecycle.withStarted {
             viewModel.onAction(QRScanAction.OnBindCamera(context, lifecycleOwner))
+        }
+    }
+
+    ObserveAsEvents(viewModel.event) { event ->
+        when (event) {
+            QRScanEvent.GrantCameraAccess -> {
+                val result = activity?.canRequestAgain() ?: false
+                if (result) {
+                    requestCameraPermission.launch(Manifest.permission.CAMERA)
+                }
+            }
+
+            QRScanEvent.OnCloseApp -> {
+                activity?.finish()
+            }
         }
     }
 
@@ -60,10 +86,11 @@ fun QRScanScreen(
     onAction: (QRScanAction) -> Unit,
 ) {
     Scaffold { innerPadding ->
-        Box(
+        ContentWithBottomMessageBar(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(Color.White),
+            state = state.messageBarState
         ) {
             Column(
                 modifier = Modifier
@@ -78,6 +105,13 @@ fun QRScanScreen(
                     ViewFinderComponent(surfaceRequest)
                 }
             }
+
+            if (state.showCameraRational) {
+                CameraRationale(
+                    onClickCloseApp = { onAction(QRScanAction.OnClickCloseApp) },
+                    onClickGrantAccess = { onAction(QRScanAction.OnClickGrantAccess) }
+                )
+            }
         }
 
 
@@ -91,4 +125,28 @@ private fun Preview() {
         QRScanScreen(
             state = QRScanState(), onAction = {})
     }
+}
+
+
+private fun Activity.canRequestAgain(): Boolean {
+    val resultForPermissionCheck = this.checkSelfPermission(Manifest.permission.CAMERA)
+    if (resultForPermissionCheck == PackageManager.PERMISSION_GRANTED) {
+        return false
+    }
+    Log.d("checkCameraPermission", "checkCameraPermission: $")
+    val result = this.shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)
+    if (result) {
+        return true
+    } else {
+        this.openAppSettings()
+        return true
+    }
+
+}
+
+fun Activity.openAppSettings() {
+    Intent(
+        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+        Uri.fromParts("package", packageName, null)
+    ).also(::startActivity)
 }

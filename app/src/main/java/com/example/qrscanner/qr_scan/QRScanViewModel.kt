@@ -8,10 +8,14 @@ import androidx.camera.lifecycle.awaitInstance
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.qrscanner.R
+import com.example.qrscanner.core.presentation.util.UiText
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -32,6 +36,9 @@ class QRScanViewModel : ViewModel() {
         initialValue = QRScanState()
     )
 
+    private val _event = Channel<QRScanEvent>()
+    val event = _event.receiveAsFlow()
+
     private val cameraPreviewUseCase = Preview.Builder().build().apply {
         setSurfaceProvider { newSurfaceRequest ->
             _state.update {
@@ -46,6 +53,20 @@ class QRScanViewModel : ViewModel() {
         when (action) {
             is QRScanAction.OnRequestPermission -> requestedPermission(action.isGranted)
             is QRScanAction.OnBindCamera -> onBindCamera(action.context, action.lifecycleOwner)
+            QRScanAction.OnClickCloseApp -> onClickCloseApp()
+            QRScanAction.OnClickGrantAccess -> onClickGrantAccess()
+        }
+    }
+
+    private fun onClickGrantAccess() {
+        viewModelScope.launch {
+            _event.send(QRScanEvent.GrantCameraAccess)
+        }
+    }
+
+    private fun onClickCloseApp() {
+        viewModelScope.launch {
+            _event.send(QRScanEvent.OnCloseApp)
         }
     }
 
@@ -58,6 +79,11 @@ class QRScanViewModel : ViewModel() {
     }
 
     private fun requestedPermission(isGranted: Boolean) {
+        if (isGranted) {
+            _state.value.messageBarState.addSuccess(
+                UiText.StringResource(R.string.permission_granted)
+            )
+        }
         _state.update { it.copy(hasCameraPermission = isGranted) }
         _state.update {
             it.copy(

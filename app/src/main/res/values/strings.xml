@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">QRScanner</string>
+    <string name="permission_granted">Camera permission granted</string>
 </resources>

@@ -27,8 +27,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.qrscanner.ui.theme.OnOverlay
 import com.example.qrscanner.ui.theme.QRScannerTheme
+import com.example.qrscanner.ui.theme.onOverlay
 
 @Composable
 fun ViewFinderComponent(
@@ -40,9 +40,10 @@ fun ViewFinderComponent(
     ) {
         Text(
             text = "Point your camera at a QR code",
+            style = MaterialTheme.typography.titleSmall,
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.OnOverlay
+            color = MaterialTheme.colorScheme.onOverlay
         )
         Spacer(
             modifier = Modifier.height(42.dp)

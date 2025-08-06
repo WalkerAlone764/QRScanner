@@ -69,4 +69,7 @@ dependencies {
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.lifecycle)
 
+    //ML kit
+        implementation("com.google.mlkit:barcode-scanning:17.2.0")
+
 }

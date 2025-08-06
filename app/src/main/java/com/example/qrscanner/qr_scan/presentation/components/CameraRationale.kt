@@ -1,4 +1,4 @@
-package com.example.qrscanner.qr_scan.components
+package com.example.qrscanner.qr_scan.presentation.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

@@ -1,6 +1,7 @@
 package com.example.qrscanner.qr_scan.presentation.scan
 
 import android.content.Context
+import android.util.Log
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
@@ -12,7 +13,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.qrscanner.R
 import com.example.qrscanner.core.presentation.util.UiText
-import com.example.qrscanner.qr_scan.data.AndroidQRAnalysis
+import com.example.qrscanner.qr_scan.domain.QRAnalysis
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,15 +29,17 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
 
-class QRScanViewModel : ViewModel() {
-
-    val androidQRAnalysis = AndroidQRAnalysis()
+class QRScanViewModel(
+    private val qrAnalysis: QRAnalysis
+) : ViewModel() {
 
     init {
-        androidQRAnalysis
+        qrAnalysis
             .result
+            .distinctUntilChanged()
             .onEach {
                 //handle data
+                Log.d("QRScanViewModel", "scan result : $it")
             }
             .launchIn(viewModelScope)
     }
@@ -76,7 +79,7 @@ class QRScanViewModel : ViewModel() {
         .apply {
 
             setAnalyzer(
-                Executors.newSingleThreadExecutor(), androidQRAnalysis
+                Executors.newSingleThreadExecutor(), qrAnalysis as ImageAnalysis.Analyzer
             )
         }
 

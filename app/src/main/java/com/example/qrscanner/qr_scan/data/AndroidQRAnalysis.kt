@@ -5,25 +5,22 @@ import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.example.qrscanner.qr_scan.domain.QRAnalysis
-import com.example.qrscanner.qr_scan.domain.QRAnalysisResult
+import com.example.qrscanner.qr_scan.domain.model.QRAnalysisResult
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class AndroidQRAnalysis : QRAnalysis, ImageAnalysis.Analyzer {
-
     private val scope = CoroutineScope(Dispatchers.Main)
 
     private val _isLoading = MutableStateFlow<Boolean>(false)

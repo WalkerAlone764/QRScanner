@@ -26,8 +26,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.example.qrscanner.core.presentation.util.MessageBarState
 import com.example.qrscanner.core.presentation.util.MessageType
-import com.example.qrscanner.ui.theme.onSuccess
-import com.example.qrscanner.ui.theme.success
+import com.example.qrscanner.core.ui.theme.onSuccess
+import com.example.qrscanner.core.ui.theme.success
 import java.util.Timer
 import kotlin.concurrent.schedule
 

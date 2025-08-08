@@ -27,8 +27,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.qrscanner.ui.theme.QRScannerTheme
-import com.example.qrscanner.ui.theme.onOverlay
+import com.example.qrscanner.core.ui.theme.QRScannerTheme
+import com.example.qrscanner.core.ui.theme.onOverlay
 
 @Composable
 fun ViewFinderComponent(

@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.qrscanner.core.presentation.components.CircularButton
-import com.example.qrscanner.ui.theme.QRScannerTheme
+import com.example.qrscanner.core.ui.theme.QRScannerTheme
 
 @Composable
 fun CameraRationale(

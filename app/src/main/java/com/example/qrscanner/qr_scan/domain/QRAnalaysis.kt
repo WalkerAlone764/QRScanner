@@ -1,5 +1,6 @@
 package com.example.qrscanner.qr_scan.domain
 
+import com.example.qrscanner.qr_scan.domain.model.QRAnalysisResult
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -9,9 +10,4 @@ interface QRAnalysis {
     val result: SharedFlow<QRAnalysisResult>
 
 
-}
-
-sealed class QRAnalysisResult {
-    data class Success(val data: String) : QRAnalysisResult()
-    data class Error(val exception: Exception) : QRAnalysisResult()
 }

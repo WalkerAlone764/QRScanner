@@ -27,17 +27,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.withStarted
 import com.example.qrscanner.core.presentation.components.ContentWithBottomMessageBar
 import com.example.qrscanner.core.presentation.util.ObserveAsEvents
+import com.example.qrscanner.core.ui.theme.QRScannerTheme
 import com.example.qrscanner.qr_scan.presentation.scan.components.CameraRationale
 import com.example.qrscanner.qr_scan.presentation.scan.components.ViewFinderComponent
-import com.example.qrscanner.ui.theme.QRScannerTheme
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun QRScanRoot(
-    viewModel: QRScanViewModel = viewModel()
+    viewModel: QRScanViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 

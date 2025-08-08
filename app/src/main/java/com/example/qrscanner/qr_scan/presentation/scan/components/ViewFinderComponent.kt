@@ -1,4 +1,4 @@
-package com.example.qrscanner.qr_scan.presentation.components
+package com.example.qrscanner.qr_scan.presentation.scan.components
 
 import androidx.camera.compose.CameraXViewfinder
 import androidx.camera.core.SurfaceRequest

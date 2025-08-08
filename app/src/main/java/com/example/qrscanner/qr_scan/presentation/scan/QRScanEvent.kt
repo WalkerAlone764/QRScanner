@@ -1,4 +1,4 @@
-package com.example.qrscanner.qr_scan.presentation
+package com.example.qrscanner.qr_scan.presentation.scan
 
 sealed interface QRScanEvent {
     data object OnCloseApp: QRScanEvent

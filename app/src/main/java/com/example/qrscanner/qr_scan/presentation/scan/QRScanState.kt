@@ -1,4 +1,4 @@
-package com.example.qrscanner.qr_scan.presentation
+package com.example.qrscanner.qr_scan.presentation.scan
 
 import androidx.camera.core.SurfaceRequest
 import com.example.qrscanner.core.presentation.util.MessageBarState

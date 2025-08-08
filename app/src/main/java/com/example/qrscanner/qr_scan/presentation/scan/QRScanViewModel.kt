@@ -1,7 +1,6 @@
-package com.example.qrscanner.qr_scan.presentation
+package com.example.qrscanner.qr_scan.presentation.scan
 
 import android.content.Context
-import android.util.Log
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
@@ -13,13 +12,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.qrscanner.R
 import com.example.qrscanner.core.presentation.util.UiText
-import com.example.qrscanner.qr_scan.data.QrCodeAnalyzer
+import com.example.qrscanner.qr_scan.data.AndroidQRAnalysis
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -28,6 +29,17 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
 
 class QRScanViewModel : ViewModel() {
+
+    val androidQRAnalysis = AndroidQRAnalysis()
+
+    init {
+        androidQRAnalysis
+            .result
+            .onEach {
+                //handle data
+            }
+            .launchIn(viewModelScope)
+    }
 
     private var hasLoadedInitialData = false
 
@@ -62,23 +74,10 @@ class QRScanViewModel : ViewModel() {
         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
         .build()
         .apply {
+
             setAnalyzer(
-                Executors.newSingleThreadExecutor(), QrCodeAnalyzer(
-                    onQrCodeScanned = { qrCodeValue ->
-                        // Handle the scanned QR code value
-                        // For example, update state or send an event
-                        Log.d("QRScanViewModel", "Scanned QR Code: $qrCodeValue")
-                        viewModelScope.launch {
-//                        _event.send(QRScanEvent.OnQRCodeScanned(qrCodeValue))
-                            // You might want to update the state as well
-                            // _state.update { it.copy(scannedQrValue = qrCodeValue) }
-                        }
-                    },
-                    onError = { exception ->
-                        Log.e("QRScanViewModel", "Error scanning QR Code", exception)
-                        // Handle error, maybe show a message
-                    }
-                ))
+                Executors.newSingleThreadExecutor(), androidQRAnalysis
+            )
         }
 
     init {

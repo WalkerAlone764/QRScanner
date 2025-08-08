@@ -1,4 +1,4 @@
-package com.example.qrscanner.qr_scan.presentation
+package com.example.qrscanner.qr_scan.presentation.scan
 
 import android.content.Context
 import androidx.lifecycle.LifecycleOwner

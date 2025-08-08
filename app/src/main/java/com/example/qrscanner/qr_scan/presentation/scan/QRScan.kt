@@ -1,4 +1,4 @@
-package com.example.qrscanner.qr_scan.presentation
+package com.example.qrscanner.qr_scan.presentation.scan
 
 import android.Manifest
 import android.app.Activity
@@ -31,8 +31,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.withStarted
 import com.example.qrscanner.core.presentation.components.ContentWithBottomMessageBar
 import com.example.qrscanner.core.presentation.util.ObserveAsEvents
-import com.example.qrscanner.qr_scan.presentation.components.CameraRationale
-import com.example.qrscanner.qr_scan.presentation.components.ViewFinderComponent
+import com.example.qrscanner.qr_scan.presentation.scan.components.CameraRationale
+import com.example.qrscanner.qr_scan.presentation.scan.components.ViewFinderComponent
 import com.example.qrscanner.ui.theme.QRScannerTheme
 
 @Composable
@@ -49,6 +49,7 @@ fun QRScanRoot(
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
     val activity = LocalActivity.current
+
 
     LaunchedEffect(lifecycleOwner) {
         lifecycleOwner.lifecycle.withStarted {

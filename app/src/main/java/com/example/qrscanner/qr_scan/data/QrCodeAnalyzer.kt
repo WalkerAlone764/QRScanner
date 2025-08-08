@@ -7,6 +7,9 @@ import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 class QrCodeAnalyzer(
     private val onQrCodeScanned: (String) -> Unit,
@@ -18,10 +21,14 @@ class QrCodeAnalyzer(
         .build()
     private val scanner = BarcodeScanning.getClient(scannerOptions)
 
+    private val _isLoading = MutableStateFlow<Boolean>(false)
+    private val isLoading = _isLoading.asStateFlow()
+
     @SuppressLint("UnsafeOptInUsageError")
     override fun analyze(imageProxy: ImageProxy) {
         val mediaImage = imageProxy.image
         if (mediaImage != null) {
+            _isLoading.update { true }
             val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
             scanner.process(image)
                 .addOnSuccessListener { barcodes ->
@@ -36,6 +43,7 @@ class QrCodeAnalyzer(
                 }
                 .addOnCompleteListener {
                     imageProxy.close()
+                    _isLoading.update { false }
                 }
         } else {
             imageProxy.close() // Ensure proxy is closed even if mediaImage is null

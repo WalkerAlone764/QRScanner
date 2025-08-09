@@ -14,6 +14,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.qrscanner.R
 import com.example.qrscanner.core.presentation.util.UiText
 import com.example.qrscanner.qr_scan.domain.QRAnalysis
+import com.example.qrscanner.qr_scan.domain.model.QRAnalysisResult
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,17 +34,6 @@ class QRScanViewModel(
     private val qrAnalysis: QRAnalysis
 ) : ViewModel() {
 
-    init {
-        qrAnalysis
-            .result
-            .distinctUntilChanged()
-            .onEach {
-                //handle data
-                Log.d("QRScanViewModel", "scan result : $it")
-            }
-            .launchIn(viewModelScope)
-    }
-
     private var hasLoadedInitialData = false
 
     private val _state = MutableStateFlow(QRScanState())
@@ -60,6 +50,28 @@ class QRScanViewModel(
 
     private val _event = Channel<QRScanEvent>()
     val event = _event.receiveAsFlow()
+
+    init {
+        qrAnalysis
+            .result
+            .distinctUntilChanged()
+            .onEach { result ->
+                //handle data
+                Log.d("QRScanViewModel", "scan result : $result")
+                when (result) {
+                    is QRAnalysisResult.Error -> {
+                        _state.update { it.copy(hasError = true) }
+                    }
+
+                    is QRAnalysisResult.Success -> {
+                        //TODO(handle the success)
+                        _state.update { it.copy(hasError = false) }
+                    }
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
 
     private val cameraPreviewUseCase = Preview.Builder().build().apply {
         setSurfaceProvider { newSurfaceRequest ->

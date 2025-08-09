@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.example.qrscanner.qr_scan.presentation.scan
 
 import android.Manifest
@@ -15,6 +17,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,6 +35,7 @@ import com.example.qrscanner.core.presentation.components.ContentWithBottomMessa
 import com.example.qrscanner.core.presentation.util.ObserveAsEvents
 import com.example.qrscanner.core.ui.theme.QRScannerTheme
 import com.example.qrscanner.qr_scan.presentation.scan.components.CameraRationale
+import com.example.qrscanner.qr_scan.presentation.scan.components.ErrorMessageDialog
 import com.example.qrscanner.qr_scan.presentation.scan.components.ViewFinderComponent
 import org.koin.androidx.compose.koinViewModel
 
@@ -111,6 +115,12 @@ fun QRScanScreen(
                 CameraRationale(
                     onClickCloseApp = { onAction(QRScanAction.OnClickCloseApp) },
                     onClickGrantAccess = { onAction(QRScanAction.OnClickGrantAccess) }
+                )
+            }
+
+            if (state.hasError) {
+                ErrorMessageDialog(
+                    onDismiss = { }
                 )
             }
         }

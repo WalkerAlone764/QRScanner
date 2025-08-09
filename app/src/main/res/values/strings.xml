@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">QRScanner</string>
     <string name="permission_granted">Camera permission granted</string>
+    <string name="no_qr_codes_found">No QR-codes found</string>
 </resources>

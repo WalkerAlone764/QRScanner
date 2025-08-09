@@ -1,9 +1,11 @@
 package com.example.qrscanner.qr_scan.data
 
+import android.util.Log
 import androidx.annotation.OptIn
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
+import com.example.qrscanner.core.util.toBitmap
 import com.example.qrscanner.qr_scan.domain.QRAnalysis
 import com.example.qrscanner.qr_scan.domain.model.QRAnalysisResult
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
@@ -44,12 +46,15 @@ class AndroidQRAnalysis : QRAnalysis, ImageAnalysis.Analyzer {
         if (mediaImage != null) {
 //            _isLoading.update { true }
             val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
+            val imageBitmap = image.mediaImage?.toBitmap()
+
             scanner
                 .process(image)
                 .addOnSuccessListener { barcodes ->
                     if (barcodes.isNotEmpty()) {
                         barcodes.firstOrNull()?.rawValue?.let { value ->
                             scope.launch {
+                                Log.d("bitmap", imageBitmap.toString())
                                 _result.emit(QRAnalysisResult.Success(value))
                             }
                         }

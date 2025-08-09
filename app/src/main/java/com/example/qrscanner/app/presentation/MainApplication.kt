@@ -1,4 +1,4 @@
-package com.example.qrscanner
+package com.example.qrscanner.app.presentation
 
 import android.app.Application
 import com.example.qrscanner.qr_scan.di.appModule

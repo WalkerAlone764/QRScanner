@@ -6,7 +6,14 @@ import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.example.qrscanner.core.util.toBitmap
+import com.example.qrscanner.qr_scan.data.model.BarcodeContactResultWrapper
+import com.example.qrscanner.qr_scan.data.model.BarcodeGeolocationResultWrapper
+import com.example.qrscanner.qr_scan.data.model.BarcodeLinkResultWrapper
+import com.example.qrscanner.qr_scan.data.model.BarcodePhoneResultWrapper
+import com.example.qrscanner.qr_scan.data.model.BarcodeTextResultWrapper
+import com.example.qrscanner.qr_scan.data.model.BarcodeWifiResultWrapper
 import com.example.qrscanner.qr_scan.domain.QRAnalysis
+import com.example.qrscanner.qr_scan.domain.model.BarcodeType
 import com.example.qrscanner.qr_scan.domain.model.QRAnalysisResult
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
@@ -21,6 +28,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 
 class AndroidQRAnalysis : QRAnalysis, ImageAnalysis.Analyzer {
     private val scope = CoroutineScope(Dispatchers.Main)
@@ -52,12 +60,137 @@ class AndroidQRAnalysis : QRAnalysis, ImageAnalysis.Analyzer {
                 .process(image)
                 .addOnSuccessListener { barcodes ->
                     if (barcodes.isNotEmpty()) {
-                        barcodes.firstOrNull()?.rawValue?.let { value ->
-                            scope.launch {
-                                Log.d("bitmap", imageBitmap.toString())
-                                _result.emit(QRAnalysisResult.Success(value))
+                        barcodes.forEach {
+                            Log.d("barcode", it.rawValue.toString())
+                        }
+
+                        scope.launch {
+                            barcodes?.firstOrNull()?.let { barcode ->
+                                val valueType = barcode.valueType
+                                when (valueType) {
+                                    Barcode.TYPE_GEO -> {
+                                        val type = BarcodeType.GEOLOCATION
+                                        val geo = barcode.geoPoint
+                                        val result = BarcodeGeolocationResultWrapper(
+                                            lat = geo?.lat, long = geo?.lng
+                                        )
+                                        val resultAsJson = Json.encodeToString(result)
+
+                                        _result.emit(
+                                            QRAnalysisResult.Success(
+                                                type = type,
+                                                value = resultAsJson
+                                            )
+                                        )
+                                    }
+
+                                    Barcode.TYPE_URL -> {
+                                        val type = BarcodeType.LINK
+                                        val url = barcode.url
+                                        val result = BarcodeLinkResultWrapper(
+                                            title = url?.title,
+                                            url = url?.url
+                                        )
+
+                                        val resultAsJson = Json.encodeToString(result)
+                                        _result.emit(
+                                            QRAnalysisResult.Success(
+                                                type = type,
+                                                value = resultAsJson
+                                            )
+                                        )
+                                    }
+
+                                    Barcode.TYPE_WIFI -> {
+                                        val type = BarcodeType.WIFI
+                                        val ssid = barcode.wifi!!.ssid
+                                        val password = barcode.wifi!!.password
+                                        val encryptionType = barcode.wifi!!.encryptionType
+                                        val encryption: String = when (encryptionType) {
+                                            0 -> "OPEN"
+                                            1 -> "WPA"
+                                            2 -> "WEP"
+                                            3 -> "WPA2"
+                                            4 -> "WPA3"
+                                            else -> "UNKNOWN" // Handle cases with unexpected or undefined values
+                                        }
+                                        val result = BarcodeWifiResultWrapper(
+                                            ssid = ssid,
+                                            password = password,
+                                            encryption = encryption
+                                        )
+
+                                        val resultAsJson = Json.encodeToString(result)
+
+                                        _result.emit(
+                                            QRAnalysisResult.Success(
+                                                type = type,
+                                                value = resultAsJson
+                                            )
+                                        )
+                                    }
+
+                                    Barcode.TYPE_CONTACT_INFO -> {
+                                        val type = BarcodeType.CONTACT
+                                        val contactInfo = barcode.contactInfo
+
+                                        val result = BarcodeContactResultWrapper(
+                                            name = contactInfo?.name?.formattedName,
+                                            phone = contactInfo?.phones?.firstOrNull()?.number,
+                                            email = contactInfo?.emails?.firstOrNull()?.address
+                                        )
+
+                                        val resultAsJson = Json.encodeToString(result)
+
+                                        _result.emit(
+                                            QRAnalysisResult.Success(
+                                                type = type,
+                                                value = resultAsJson
+                                            )
+                                        )
+                                    }
+
+                                    Barcode.TYPE_TEXT -> {
+                                        val type = BarcodeType.TEXT
+                                        val text = barcode.rawValue
+
+                                        val result = BarcodeTextResultWrapper(
+                                            text = text
+                                        )
+
+                                        val resultAsJson = Json.encodeToString(result)
+
+                                        _result.emit(
+                                            QRAnalysisResult.Success(
+                                                type = type,
+                                                value = resultAsJson
+                                            )
+                                        )
+
+                                    }
+
+                                    Barcode.TYPE_PHONE -> {
+                                        val type = BarcodeType.PHONE_NUMBER
+                                        val phone = barcode.phone
+
+                                        val result = BarcodePhoneResultWrapper(
+                                            phone = phone?.number
+                                        )
+
+                                        val resultAsJson = Json.encodeToString(result)
+
+                                        _result.emit(
+                                            QRAnalysisResult.Success(
+                                                type = type,
+                                                value = resultAsJson
+                                            )
+                                        )
+
+                                    }
+                                }
                             }
                         }
+
                     }
                 }
                 .addOnFailureListener { exception ->

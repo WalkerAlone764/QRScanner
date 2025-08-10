@@ -66,6 +66,7 @@ class QRScanViewModel(
                     is QRAnalysisResult.Success -> {
                         //TODO(handle the success)
                         _state.update { it.copy(hasError = false) }
+                        _event.send(QRScanEvent.OnSuccess(result.type, result.value))
                     }
                 }
             }

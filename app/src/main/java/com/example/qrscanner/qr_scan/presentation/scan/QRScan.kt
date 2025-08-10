@@ -34,6 +34,7 @@ import androidx.lifecycle.withStarted
 import com.example.qrscanner.core.presentation.components.ContentWithBottomMessageBar
 import com.example.qrscanner.core.presentation.util.ObserveAsEvents
 import com.example.qrscanner.core.ui.theme.QRScannerTheme
+import com.example.qrscanner.qr_scan.domain.model.BarcodeType
 import com.example.qrscanner.qr_scan.presentation.scan.components.CameraRationale
 import com.example.qrscanner.qr_scan.presentation.scan.components.ErrorMessageDialog
 import com.example.qrscanner.qr_scan.presentation.scan.components.ViewFinderComponent
@@ -41,6 +42,7 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun QRScanRoot(
+    onNavigateToResult: (type: BarcodeType, value: String) -> Unit,
     viewModel: QRScanViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -72,6 +74,10 @@ fun QRScanRoot(
 
             QRScanEvent.OnCloseApp -> {
                 activity?.finish()
+            }
+
+            is QRScanEvent.OnSuccess -> {
+                onNavigateToResult(event.type, event.value)
             }
         }
     }

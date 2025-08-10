@@ -1,5 +1,6 @@
 package com.example.qrscanner.app.presentation
 
+import com.example.qrscanner.qr_scan.domain.model.BarcodeType
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -8,6 +9,7 @@ sealed interface Routes {
     data object Scan: Routes
     @Serializable
     data class Result(
-        val data: String
+        val type: BarcodeType,
+        val value: String
     ): Routes
 }

@@ -77,4 +77,7 @@ dependencies {
     implementation(libs.androidx.compose.navigation)
     implementation(libs.kotlinx.serialization.json)
 
+    //QR Generator
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+
 }

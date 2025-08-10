@@ -54,7 +54,7 @@ class AndroidQRAnalysis : QRAnalysis, ImageAnalysis.Analyzer {
         if (mediaImage != null) {
 //            _isLoading.update { true }
             val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
-            val imageBitmap = image.mediaImage?.toBitmap()
+            image.mediaImage?.toBitmap()
 
             scanner
                 .process(image)
@@ -133,9 +133,11 @@ class AndroidQRAnalysis : QRAnalysis, ImageAnalysis.Analyzer {
                                     Barcode.TYPE_CONTACT_INFO -> {
                                         val type = BarcodeType.CONTACT
                                         val contactInfo = barcode.contactInfo
-
                                         val result = BarcodeContactResultWrapper(
-                                            name = contactInfo?.name?.formattedName,
+                                            formattedName = contactInfo?.name?.formattedName,
+                                            prefix = contactInfo?.name?.prefix,
+                                            middle = contactInfo?.name?.middle,
+                                            last = contactInfo?.name?.last,
                                             phone = contactInfo?.phones?.firstOrNull()?.number,
                                             email = contactInfo?.emails?.firstOrNull()?.address
                                         )

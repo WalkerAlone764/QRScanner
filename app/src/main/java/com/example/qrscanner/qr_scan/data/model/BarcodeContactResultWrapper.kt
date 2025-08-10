@@ -4,7 +4,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class BarcodeContactResultWrapper(
-    val name: String?,
+    val formattedName: String?,
+    val prefix: String?,
+    val middle: String?,
+    val last: String?,
     val phone: String?,
     val email: String?,
 )

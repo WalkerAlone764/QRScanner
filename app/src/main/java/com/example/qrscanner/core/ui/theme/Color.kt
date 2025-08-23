@@ -59,3 +59,6 @@ val ColorScheme.WifiBackground: Color
 
 val ColorScheme.onOverlay: Color
     get() = PureWhite
+
+val ColorScheme.linkBackground: Color
+    get() = LaserLemon.copy(alpha = 0.4f)

@@ -2,4 +2,18 @@
     <string name="app_name">QRScanner</string>
     <string name="permission_granted">Camera permission granted</string>
     <string name="no_qr_codes_found">No QR-codes found</string>
+    <string name="contact">Contact</string>
+    <string name="copy">Copy</string>
+    <string name="share">Share</string>
+    <string name="geolocation">Geolocation</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="scan_result">Scan Result</string>
+    <string name="back">Back</string>
+    <string name="text">Text</string>
+    <string name="show_less">Show Less</string>
+    <string name="show_more">Show More</string>
+    <string name="ssid">SSID: %1$s</string>
+    <string name="password">Password: %1$s</string>
+    <string name="encryption_type">Encryption type: %1$s</string>
+    <string name="wi_fi">Wi-Fi</string>
 </resources>

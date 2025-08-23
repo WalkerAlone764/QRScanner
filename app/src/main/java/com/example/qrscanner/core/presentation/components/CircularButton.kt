@@ -41,7 +41,7 @@ fun CircularButton(
                 vertical = 12.dp, horizontal = 18.dp
             )
             .heightIn(
-                min = 44.dp
+                min = 12.dp
             )
             .then(modifier),
         horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),

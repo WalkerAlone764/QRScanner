@@ -16,11 +16,14 @@ import com.example.qrscanner.qr_scan.data.model.BarcodeWifiResultWrapper
 import com.example.qrscanner.qr_scan.domain.model.BarcodeType
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
 class ResultViewModel(
@@ -34,28 +37,33 @@ class ResultViewModel(
 
     private val _state = MutableStateFlow(ResultState())
     val state = _state.onStart {
-            if (!hasLoadedInitialData) {
-                /** Load initial data here **/
-                hasLoadedInitialData = true
-            }
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000L),
-            initialValue = ResultState()
-        )
+        if (!hasLoadedInitialData) {
+            /** Load initial data here **/
+            hasLoadedInitialData = true
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000L),
+        initialValue = ResultState()
+    )
+
+    private val _event = Channel<ResultEvent>()
+    val event = _event.receiveAsFlow()
 
     init {
         val type = route.type
+        _state.update { it.copy(type = type) }
         when (type) {
             BarcodeType.LINK -> {
                 val linkWrapper = Json.decodeFromString<BarcodeLinkResultWrapper>(route.value)
                 val qrBitmap = generateQR(text = linkWrapper.url)
-                _state.update { it.copy(bitmap = qrBitmap) }
+                _state.update { it.copy(bitmap = qrBitmap, linkResultWrapper = linkWrapper) }
             }
 
             BarcodeType.CONTACT -> {
                 val contactWrapper = Json.decodeFromString<BarcodeContactResultWrapper>(route.value)
-                val contactQRContent = "MECARD:N:${contactWrapper.formattedName};TEL:${contactWrapper.phone};EMAIL:${contactWrapper.email};;"
+                val contactQRContent =
+                    "MECARD:N:${contactWrapper.formattedName};TEL:${contactWrapper.phone};EMAIL:${contactWrapper.email};;"
 //                val contactQRContent = """
 //BEGIN:VCARD
 //VERSION:3.0
@@ -67,33 +75,35 @@ class ResultViewModel(
 //""".trimIndent()
 
                 val qrBitmap = generateQR(text = contactQRContent)
-                _state.update { it.copy(bitmap = qrBitmap) }
+                _state.update { it.copy(bitmap = qrBitmap, contactResultWrapper = contactWrapper) }
             }
 
             BarcodeType.PHONE_NUMBER -> {
                 val phoneWrapper = Json.decodeFromString<BarcodePhoneResultWrapper>(route.value)
                 val phoneQRContent = "tel:${phoneWrapper.phone}"
                 val qrBitmap = generateQR(text = phoneQRContent)
-                _state.update { it.copy(bitmap = qrBitmap) }
+                _state.update { it.copy(bitmap = qrBitmap, phoneResultWrapper = phoneWrapper) }
             }
+
             BarcodeType.GEOLOCATION -> {
                 val geoWrapper = Json.decodeFromString<BarcodeGeolocationResultWrapper>(route.value)
                 val geoQRContent = "geo:${geoWrapper.lat},${geoWrapper.long}"
                 val qrBitmap = generateQR(text = geoQRContent)
-                _state.update { it.copy(bitmap = qrBitmap) }
+                _state.update { it.copy(bitmap = qrBitmap, geolocationResultWrapper = geoWrapper) }
             }
+
             BarcodeType.WIFI -> {
                 val wifiWrapper = Json.decodeFromString<BarcodeWifiResultWrapper>(route.value)
                 val wifiQRContent =
                     "WIFI:S:${wifiWrapper.ssid};T:${wifiWrapper.encryption};P:${wifiWrapper.password};;"
                 val qrBitmap = generateQR(text = wifiQRContent)
-                _state.update { it.copy(bitmap = qrBitmap) }
+                _state.update { it.copy(bitmap = qrBitmap, wifiResultWrapper = wifiWrapper) }
             }
 
             BarcodeType.TEXT -> {
                 val textWrapper = Json.decodeFromString<BarcodeTextResultWrapper>(route.value)
                 val qrBitmap = generateQR(text = textWrapper.text)
-                _state.update { it.copy(bitmap = qrBitmap) }
+                _state.update { it.copy(bitmap = qrBitmap, textResultWrapper = textWrapper) }
             }
 
         }
@@ -101,15 +111,62 @@ class ResultViewModel(
 
     fun onAction(action: ResultAction) {
         when (action) {
-            else -> TODO("Handle actions")
+            ResultAction.OnClickCopy -> onCopy()
+            ResultAction.OnClickShare -> onShare()
+            is ResultAction.OnClickLink -> onCLickLink(action.link)
+        }
+    }
+
+    private fun onCLickLink(link: String) {
+        viewModelScope.launch {
+            _event.send(
+                ResultEvent.ClickLink(
+                    link
+                )
+            )
+        }
+
+    }
+
+    private fun onShare() {
+        viewModelScope.launch {
+            val text = convertToString()
+            _event.send(
+                ResultEvent.ClickShare(
+                    text
+                )
+            )
+        }
+    }
+
+    private fun onCopy() {
+        viewModelScope.launch {
+            val text = convertToString()
+            _event.send(
+                ResultEvent.ClickCopy(
+                    text
+                )
+            )
+        }
+    }
+
+    private fun convertToString(): String {
+        val type = _state.value.type
+        return when (type) {
+            BarcodeType.LINK -> _state.value.linkResultWrapper?.url ?: ""
+            BarcodeType.CONTACT -> "${_state.value.contactResultWrapper?.formattedName ?: ""} ${_state.value.contactResultWrapper?.phone ?: ""} ${_state.value.contactResultWrapper?.email ?: ""}"
+            BarcodeType.PHONE_NUMBER -> _state.value.phoneResultWrapper?.phone ?: ""
+            BarcodeType.GEOLOCATION -> "${_state.value.geolocationResultWrapper?.lat ?: ""} ${_state.value.geolocationResultWrapper?.long ?: ""}"
+            BarcodeType.WIFI -> "SSID: ${_state.value.wifiResultWrapper?.ssid ?: ""}\nPassword: ${_state.value.wifiResultWrapper?.password ?: ""}\nEncryption type: ${_state.value.wifiResultWrapper?.encryption ?: ""}"
+            BarcodeType.TEXT -> _state.value.textResultWrapper?.text ?: ""
         }
     }
 
     fun generateQR(text: String?): Bitmap {
         val size = 512
         val bits = QRCodeWriter().encode(
-                text, BarcodeFormat.QR_CODE, size, size
-            )
+            text, BarcodeFormat.QR_CODE, size, size
+        )
         val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.RGB_565)
         for (x in 0 until size) {
             for (y in 0 until size) {

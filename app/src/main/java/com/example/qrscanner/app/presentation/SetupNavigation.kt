@@ -39,7 +39,11 @@ fun SetupNavigation(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                ResultRoot()
+                ResultRoot(
+                    onClickBack = {
+                        navController.navigateUp()
+                    }
+                )
             }
         }
     }

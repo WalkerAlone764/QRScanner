@@ -1,5 +1,6 @@
 package com.example.qrscanner.app.presentation
 
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -20,8 +21,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         installSplashScreen()
         enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.light(1, 1),
-            navigationBarStyle = SystemBarStyle.light(1, 1)
+            statusBarStyle = SystemBarStyle.dark(
+                Color.WHITE
+            ),
+            navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT) // Assuming you want to keep navigation bar style as is
         )
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -32,6 +35,7 @@ class MainActivity : ComponentActivity() {
             QRScannerTheme {
                 val navController = rememberNavController()
                 SetupNavigation(navController = navController)
+
             }
         }
     }

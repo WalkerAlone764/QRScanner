@@ -6,7 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.example.qrscanner.app.presentation.Routes
+import com.example.qrscanner.app.presentation.navigation.Routes
 import com.example.qrscanner.qr_scan.data.model.BarcodeContactResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodeGeolocationResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodeLinkResultWrapper

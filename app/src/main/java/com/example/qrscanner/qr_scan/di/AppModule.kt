@@ -10,7 +10,9 @@ import org.koin.dsl.module
 val appModule = module {
 
     single<QRAnalysis> {
-        AndroidQRAnalysis()
+        AndroidQRAnalysis(
+            context = get()
+        )
     }
 
     viewModelOf(::QRScanViewModel)

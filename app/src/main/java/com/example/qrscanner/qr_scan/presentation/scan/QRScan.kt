@@ -3,6 +3,7 @@
 package com.example.qrscanner.qr_scan.presentation.scan
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -12,20 +13,30 @@ import android.util.Log
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.camera.compose.CameraXViewfinder
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.drawText
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -37,7 +48,6 @@ import com.example.qrscanner.core.ui.theme.QRScannerTheme
 import com.example.qrscanner.qr_scan.domain.model.BarcodeType
 import com.example.qrscanner.qr_scan.presentation.scan.components.CameraRationale
 import com.example.qrscanner.qr_scan.presentation.scan.components.ErrorMessageDialog
-import com.example.qrscanner.qr_scan.presentation.scan.components.ViewFinderComponent
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -46,6 +56,7 @@ fun QRScanRoot(
     viewModel: QRScanViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val isScanLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
     val requestCameraPermission =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -87,34 +98,208 @@ fun QRScanRoot(
     }
 
     QRScanScreen(
-        state = state, onAction = viewModel::onAction
+        isLoading = isScanLoading, state = state, onAction = viewModel::onAction
     )
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun QRScanScreen(
+    isLoading: Boolean,
     state: QRScanState,
     onAction: (QRScanAction) -> Unit,
 ) {
     Scaffold { innerPadding ->
         ContentWithBottomMessageBar(
             modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White),
+                .fillMaxSize(),
             state = state.messageBarState
         ) {
-            Column(
+            state.surfaceRequest?.let { surfaceRequest ->
+
+                CameraXViewfinder(
+                    surfaceRequest = surfaceRequest,
+                    contentScale = ContentScale.FillBounds,
+                    modifier = Modifier
+                        .fillMaxSize()
+                )
+            }
+            val cornerColor = MaterialTheme.colorScheme.primary
+
+            Canvas(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color(0xff000000).copy(0.5f))
-                    .padding(innerPadding)
-                    .padding(horizontal = 32.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                state.surfaceRequest?.let { surfaceRequest ->
-                    ViewFinderComponent(surfaceRequest)
-                }
+                val size = this.size
+                val width = 324.dp
+                val height = 324.dp
+                val radius = 16.dp
+                val strokeWidth = 8.dp
+                val strokeLength = 60.dp
+
+                val strokeLengthInPx = strokeLength.toPx()
+                val cornerRadiusInPx = radius.toPx()
+                val strokeWidthInPx = strokeWidth.toPx()
+
+
+                val scanSize = Size(
+                    width = with(density) { width.toPx() },
+                    height = with(density) { height.toPx() }
+                )
+
+                drawRect(
+                    color = Color.Black.copy(0.5f),
+                    topLeft = Offset.Zero,
+                    size = size
+                )
+
+                val scanSizeOffset = Offset(
+                    (size.width - scanSize.width) / 2,
+                    (size.height - scanSize.height) / 2
+                )
+
+                drawRoundRect(
+                    color = Color.Transparent,
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(
+                        x = with(density) { radius.toPx() },
+                        y = with(density) { radius.toPx() }
+                    ),
+                    topLeft = scanSizeOffset,
+                    size = scanSize,
+                    blendMode = BlendMode.Clear
+                )
+
+
+                //draw top left corner
+                drawLine(
+                    color = cornerColor,
+                    strokeWidth = strokeWidthInPx,
+                    start  = scanSizeOffset.copy( y = scanSizeOffset.y + cornerRadiusInPx),
+                    end = scanSizeOffset.copy( y = scanSizeOffset.y + strokeLengthInPx)
+                )
+                
+                drawLine(
+                    color = cornerColor,
+                    strokeWidth = strokeWidthInPx,
+                    start  = scanSizeOffset.copy( x = scanSizeOffset.x + cornerRadiusInPx),
+                    end = scanSizeOffset.copy( x = scanSizeOffset.x + strokeLengthInPx)
+                )
+
+                drawArc(
+                    color = cornerColor,
+                    startAngle = 180f,
+                    sweepAngle = 90f,
+                    useCenter = false,
+                    style = Stroke(width = strokeWidthInPx),
+                    topLeft = scanSizeOffset,
+                    size = Size(cornerRadiusInPx * 2, cornerRadiusInPx * 2)
+
+                )
+
+                //draw top right corner
+                drawLine(
+                    color = cornerColor,
+                    strokeWidth = strokeWidthInPx,
+                    start  = scanSizeOffset.copy(x = scanSizeOffset.x + scanSize.width - cornerRadiusInPx),
+                    end = scanSizeOffset.copy( x = scanSizeOffset.x + scanSize.width - strokeLengthInPx)
+                )
+
+                drawLine(
+                    color = cornerColor,
+                    strokeWidth = strokeWidthInPx,
+                    start = scanSizeOffset.copy(scanSizeOffset.x + scanSize.width, scanSizeOffset.y + cornerRadiusInPx),
+                    end = scanSizeOffset.copy(scanSizeOffset.x + scanSize.width, scanSizeOffset.y + cornerRadiusInPx + strokeLengthInPx)
+                )
+                
+                drawArc(
+                    color = cornerColor,
+                    startAngle = 0f,
+                    sweepAngle = -90f,
+                    useCenter = false,
+                    style = Stroke(width = strokeWidthInPx),
+                    topLeft = scanSizeOffset.copy(x = scanSizeOffset.x + scanSize.width - (cornerRadiusInPx * 2),y = scanSizeOffset.y),
+                    size = Size(cornerRadiusInPx * 2, cornerRadiusInPx * 2)
+
+                )
+
+
+                //draw bottom left corner
+                drawLine(
+                    color = cornerColor,
+                    strokeWidth = strokeWidthInPx,
+                    start = scanSizeOffset.copy(
+                        y = scanSizeOffset.y + scanSize.height - cornerRadiusInPx,
+                    ),
+                    end = scanSizeOffset.copy(
+                        y = scanSizeOffset.y + scanSize.height - cornerRadiusInPx - strokeLengthInPx,
+                    )
+                )
+
+                drawLine(
+                    color = cornerColor,
+                    strokeWidth = strokeWidthInPx,
+                    start = scanSizeOffset.copy(
+                        y = scanSizeOffset.y + scanSize.height,
+                        x = scanSizeOffset.x + cornerRadiusInPx
+                    ),
+                    end = scanSizeOffset.copy(
+                        y = scanSizeOffset.y + scanSize.height,
+                        x = scanSizeOffset.x + cornerRadiusInPx + strokeLengthInPx
+                    )
+                )
+                drawArc(
+                    color = cornerColor,
+                    startAngle = 90f,
+                    sweepAngle = 90f,
+                    useCenter = false,
+                    style = Stroke(width = strokeWidthInPx),
+                    topLeft = scanSizeOffset.copy(
+                        y = scanSizeOffset.y + scanSize.height - (cornerRadiusInPx * 2),
+                        x = scanSizeOffset.x
+                    ),
+                    size = Size(cornerRadiusInPx *2, cornerRadiusInPx*2)
+                )
+
+                // draw bottom right corner
+                drawLine(
+                    color = cornerColor,
+                    strokeWidth = strokeWidthInPx,
+                    start = scanSizeOffset.copy(
+                        x = scanSizeOffset.x + scanSize.width - cornerRadiusInPx,
+                        y = scanSizeOffset.y + scanSize.height,
+                    ),
+                    end = scanSizeOffset.copy(
+                        x = scanSizeOffset.x + scanSize.width - cornerRadiusInPx - strokeLengthInPx,
+                        y = scanSizeOffset.y + scanSize.height,
+                    )
+                )
+
+                drawLine(
+                    color = cornerColor,
+                    strokeWidth = strokeWidthInPx,
+                    start = scanSizeOffset.copy(
+                        x = scanSizeOffset.x + scanSize.width,
+                        y = scanSizeOffset.y + scanSize.height - cornerRadiusInPx
+                    ),
+                    end = scanSizeOffset.copy(
+                        x = scanSizeOffset.x + scanSize.width,
+                        y = scanSizeOffset.y + scanSize.height - cornerRadiusInPx - strokeLengthInPx
+                    )
+                )
+
+                drawArc(
+                    color = cornerColor,
+                    startAngle = 0f,
+                    sweepAngle = 90f,
+                    useCenter = false,
+                    style = Stroke(width = strokeWidthInPx),
+                    topLeft = scanSizeOffset.copy(
+                        y = scanSizeOffset.y + scanSize.height - (cornerRadiusInPx * 2) ,
+                        x = scanSizeOffset.x + scanSize.width- (cornerRadiusInPx * 2)
+                    ),
+                    size = Size(cornerRadiusInPx *2, cornerRadiusInPx*2)
+                )
+
             }
 
             if (state.showCameraRational) {
@@ -131,6 +316,20 @@ fun QRScanScreen(
             }
         }
 
+        AnimatedVisibility(
+            visible = isLoading,
+            enter = fadeIn(),
+            exit = fadeOut()
+            ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
 
     }
 }
@@ -140,7 +339,7 @@ fun QRScanScreen(
 private fun Preview() {
     QRScannerTheme {
         QRScanScreen(
-            state = QRScanState(), onAction = {})
+           isLoading = false, state = QRScanState(), onAction = {})
     }
 }
 

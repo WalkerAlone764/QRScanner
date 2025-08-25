@@ -1,11 +1,15 @@
 package com.example.qrscanner.qr_scan.data
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Rect
 import android.util.Log
 import androidx.annotation.OptIn
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
-import com.example.qrscanner.core.util.toBitmap
+import androidx.compose.ui.unit.dp
+import com.example.qrscanner.core.util.toPx
 import com.example.qrscanner.qr_scan.data.model.BarcodeContactResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodeGeolocationResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodeLinkResultWrapper
@@ -21,16 +25,22 @@ import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import kotlin.math.max
+import kotlin.math.min
 
-class AndroidQRAnalysis : QRAnalysis, ImageAnalysis.Analyzer {
+class AndroidQRAnalysis(
+    private val context: Context
+) : QRAnalysis, ImageAnalysis.Analyzer {
     private val scope = CoroutineScope(Dispatchers.Main)
 
     private val _isLoading = MutableStateFlow<Boolean>(false)
@@ -51,10 +61,34 @@ class AndroidQRAnalysis : QRAnalysis, ImageAnalysis.Analyzer {
     @OptIn(ExperimentalGetImage::class)
     override fun analyze(imageProxy: ImageProxy) {
         val mediaImage = imageProxy.image
+
         if (mediaImage != null) {
-//            _isLoading.update { true }
-            val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
-            image.mediaImage?.toBitmap()
+//            val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
+
+            val width = imageProxy.width
+            val height = imageProxy.height
+
+            val assumeSize = 250.dp.toPx(context)
+            val targetSizePx = minOf(assumeSize.toInt(), minOf(width, height))
+            val left = max(0, (width - targetSizePx) / 2)
+            val top = max(0, (height - targetSizePx) / 2)
+            val right = min(width, left + targetSizePx)
+            val bottom = min(height, top + targetSizePx)
+
+            val cropRect = Rect(left, top, right, bottom)
+
+            val rotation = imageProxy.imageInfo.rotationDegrees
+
+            val bitmap = imageProxy.toBitmap()
+            val croppedBitmap = Bitmap.createBitmap(
+                bitmap,
+                cropRect.left,
+                cropRect.top,
+                cropRect.width(),
+                cropRect.height()
+            )
+
+            val image = InputImage.fromBitmap(croppedBitmap, rotation)
 
             scanner
                 .process(image)
@@ -65,6 +99,9 @@ class AndroidQRAnalysis : QRAnalysis, ImageAnalysis.Analyzer {
                         }
 
                         scope.launch {
+                            _isLoading.update { true }
+
+                            delay(1000)
                             barcodes?.firstOrNull()?.let { barcode ->
                                 val valueType = barcode.valueType
                                 when (valueType) {
@@ -202,7 +239,7 @@ class AndroidQRAnalysis : QRAnalysis, ImageAnalysis.Analyzer {
                 }
                 .addOnCompleteListener {
                     imageProxy.close()
-//                    _isLoading.update { false }
+                    _isLoading.update { false }
                 }
         }
     }

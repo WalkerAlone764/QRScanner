@@ -8,13 +8,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.example.qrscanner.app.presentation.navigation.Routes
+import com.example.qrscanner.app.presentation.navigation.currentRoute
 import com.example.qrscanner.qr_scan.presentation.components.CustomNavBar
 import com.example.qrscanner.qr_scan.presentation.result.ResultRoot
 import com.example.qrscanner.qr_scan.presentation.scan.QRScanRoot
@@ -24,20 +27,21 @@ import com.example.qrscanner.qr_scan.presentation.scan.QRScanRoot
 fun SetupNavigation(
     navController: NavHostController
 ) {
+    val route by navController.currentRoute().collectAsStateWithLifecycle(Routes.Home)
 
     Scaffold(
         bottomBar = {
-            CustomNavBar(
-                navController = navController,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentWidth(Alignment.CenterHorizontally)
-            )
-        }
-    ) {
+            if (route == Routes.Scan || route == Routes.Create) {
+                CustomNavBar(
+                    navController = navController,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentWidth(Alignment.CenterHorizontally)
+                )
+            }
+        }) {
         NavHost(
-            navController = navController,
-            startDestination = Routes.Scan
+            navController = navController, startDestination = Routes.Scan
         ) {
             composable<Routes.Scan> {
                 QRScanRoot(
@@ -45,8 +49,7 @@ fun SetupNavigation(
                         navController.navigate(
                             Routes.Result(type, value)
                         )
-                    }
-                )
+                    })
             }
 
             composable<Routes.Result> {
@@ -59,8 +62,7 @@ fun SetupNavigation(
                     ResultRoot(
                         onClickBack = {
                             navController.navigateUp()
-                        }
-                    )
+                        })
                 }
             }
 

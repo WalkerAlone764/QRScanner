@@ -138,6 +138,7 @@ fun CustomNavBar(
             },
             colors = IconButtonDefaults.iconButtonColors(
                 containerColor = if (currentDestination?.hierarchy?.any {
+//                    Log.d("TAG", "CustomNavBar: ${navController.currentBackStackEntry?.toRoute<Routes>()}")
                         Log.d("TAG", "CustomNavBar: ${it.route}")
                         it.hasRoute(Routes.Create::class)
                     } == true) {

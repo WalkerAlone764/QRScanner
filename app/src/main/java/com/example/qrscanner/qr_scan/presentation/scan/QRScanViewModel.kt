@@ -51,6 +51,7 @@ class QRScanViewModel(
     private val _event = Channel<QRScanEvent>()
     val event = _event.receiveAsFlow()
 
+    val isLoading = qrAnalysis.isLoading
     init {
         qrAnalysis
             .result

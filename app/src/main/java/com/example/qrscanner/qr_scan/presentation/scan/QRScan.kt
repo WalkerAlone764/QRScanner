@@ -177,156 +177,166 @@ fun QRScanScreen(
                     (size.height - scanSize.height) / 2
                 )
 
-                drawRoundRect(
-                    color = Color.Transparent,
-                    cornerRadius = CornerRadius(
-                        x = with(density) { radius.toPx() },
-                        y = with(density) { radius.toPx() }
-                    ),
-                    topLeft = scanSizeOffset,
-                    size = scanSize,
-                    blendMode = BlendMode.Clear
-                )
-
-                drawText(
-                    textLayoutResult = measuredText,
-                    topLeft = scanSizeOffset.copy(
-                        y = scanSizeOffset.y - 65.dp.toPx(),
-                        x = (size.width / 2f) - (measuredText.size.width / 2f)
+//                if (!isLoading) {
+                    drawRoundRect(
+                        color = Color.Transparent,
+                        cornerRadius = CornerRadius(
+                            x = with(density) { radius.toPx() },
+                            y = with(density) { radius.toPx() }
+                        ),
+                        topLeft = scanSizeOffset,
+                        size = scanSize,
+                        blendMode = BlendMode.Clear
                     )
-                )
 
-                //draw top left corner
-                drawLine(
-                    color = cornerColor,
-                    strokeWidth = strokeWidthInPx,
-                    start  = scanSizeOffset.copy( y = scanSizeOffset.y + cornerRadiusInPx),
-                    end = scanSizeOffset.copy( y = scanSizeOffset.y + strokeLengthInPx)
-                )
-                
-                drawLine(
-                    color = cornerColor,
-                    strokeWidth = strokeWidthInPx,
-                    start  = scanSizeOffset.copy( x = scanSizeOffset.x + cornerRadiusInPx),
-                    end = scanSizeOffset.copy( x = scanSizeOffset.x + strokeLengthInPx)
-                )
-
-                drawArc(
-                    color = cornerColor,
-                    startAngle = 180f,
-                    sweepAngle = 90f,
-                    useCenter = false,
-                    style = Stroke(width = strokeWidthInPx),
-                    topLeft = scanSizeOffset,
-                    size = Size(cornerRadiusInPx * 2, cornerRadiusInPx * 2)
-
-                )
-
-                //draw top right corner
-                drawLine(
-                    color = cornerColor,
-                    strokeWidth = strokeWidthInPx,
-                    start  = scanSizeOffset.copy(x = scanSizeOffset.x + scanSize.width - cornerRadiusInPx),
-                    end = scanSizeOffset.copy( x = scanSizeOffset.x + scanSize.width - strokeLengthInPx)
-                )
-
-                drawLine(
-                    color = cornerColor,
-                    strokeWidth = strokeWidthInPx,
-                    start = scanSizeOffset.copy(scanSizeOffset.x + scanSize.width, scanSizeOffset.y + cornerRadiusInPx),
-                    end = scanSizeOffset.copy(scanSizeOffset.x + scanSize.width, scanSizeOffset.y + cornerRadiusInPx + strokeLengthInPx)
-                )
-                
-                drawArc(
-                    color = cornerColor,
-                    startAngle = 0f,
-                    sweepAngle = -90f,
-                    useCenter = false,
-                    style = Stroke(width = strokeWidthInPx),
-                    topLeft = scanSizeOffset.copy(x = scanSizeOffset.x + scanSize.width - (cornerRadiusInPx * 2),y = scanSizeOffset.y),
-                    size = Size(cornerRadiusInPx * 2, cornerRadiusInPx * 2)
-
-                )
-
-
-                //draw bottom left corner
-                drawLine(
-                    color = cornerColor,
-                    strokeWidth = strokeWidthInPx,
-                    start = scanSizeOffset.copy(
-                        y = scanSizeOffset.y + scanSize.height - cornerRadiusInPx,
-                    ),
-                    end = scanSizeOffset.copy(
-                        y = scanSizeOffset.y + scanSize.height - cornerRadiusInPx - strokeLengthInPx,
+                    drawText(
+                        textLayoutResult = measuredText,
+                        topLeft = scanSizeOffset.copy(
+                            y = scanSizeOffset.y - 65.dp.toPx(),
+                            x = (size.width / 2f) - (measuredText.size.width / 2f)
+                        )
                     )
-                )
 
-                drawLine(
-                    color = cornerColor,
-                    strokeWidth = strokeWidthInPx,
-                    start = scanSizeOffset.copy(
-                        y = scanSizeOffset.y + scanSize.height,
-                        x = scanSizeOffset.x + cornerRadiusInPx
-                    ),
-                    end = scanSizeOffset.copy(
-                        y = scanSizeOffset.y + scanSize.height,
-                        x = scanSizeOffset.x + cornerRadiusInPx + strokeLengthInPx
+                    //draw top left corner
+                    drawLine(
+                        color = cornerColor,
+                        strokeWidth = strokeWidthInPx,
+                        start = scanSizeOffset.copy(y = scanSizeOffset.y + cornerRadiusInPx),
+                        end = scanSizeOffset.copy(y = scanSizeOffset.y + strokeLengthInPx)
                     )
-                )
-                drawArc(
-                    color = cornerColor,
-                    startAngle = 90f,
-                    sweepAngle = 90f,
-                    useCenter = false,
-                    style = Stroke(width = strokeWidthInPx),
-                    topLeft = scanSizeOffset.copy(
-                        y = scanSizeOffset.y + scanSize.height - (cornerRadiusInPx * 2),
-                        x = scanSizeOffset.x
-                    ),
-                    size = Size(cornerRadiusInPx *2, cornerRadiusInPx*2)
-                )
 
-                // draw bottom right corner
-                drawLine(
-                    color = cornerColor,
-                    strokeWidth = strokeWidthInPx,
-                    start = scanSizeOffset.copy(
-                        x = scanSizeOffset.x + scanSize.width - cornerRadiusInPx,
-                        y = scanSizeOffset.y + scanSize.height,
-                    ),
-                    end = scanSizeOffset.copy(
-                        x = scanSizeOffset.x + scanSize.width - cornerRadiusInPx - strokeLengthInPx,
-                        y = scanSizeOffset.y + scanSize.height,
+                    drawLine(
+                        color = cornerColor,
+                        strokeWidth = strokeWidthInPx,
+                        start = scanSizeOffset.copy(x = scanSizeOffset.x + cornerRadiusInPx),
+                        end = scanSizeOffset.copy(x = scanSizeOffset.x + strokeLengthInPx)
                     )
-                )
 
-                drawLine(
-                    color = cornerColor,
-                    strokeWidth = strokeWidthInPx,
-                    start = scanSizeOffset.copy(
-                        x = scanSizeOffset.x + scanSize.width,
-                        y = scanSizeOffset.y + scanSize.height - cornerRadiusInPx
-                    ),
-                    end = scanSizeOffset.copy(
-                        x = scanSizeOffset.x + scanSize.width,
-                        y = scanSizeOffset.y + scanSize.height - cornerRadiusInPx - strokeLengthInPx
+                    drawArc(
+                        color = cornerColor,
+                        startAngle = 180f,
+                        sweepAngle = 90f,
+                        useCenter = false,
+                        style = Stroke(width = strokeWidthInPx),
+                        topLeft = scanSizeOffset,
+                        size = Size(cornerRadiusInPx * 2, cornerRadiusInPx * 2)
+
                     )
-                )
 
-                drawArc(
-                    color = cornerColor,
-                    startAngle = 0f,
-                    sweepAngle = 90f,
-                    useCenter = false,
-                    style = Stroke(width = strokeWidthInPx),
-                    topLeft = scanSizeOffset.copy(
-                        y = scanSizeOffset.y + scanSize.height - (cornerRadiusInPx * 2) ,
-                        x = scanSizeOffset.x + scanSize.width- (cornerRadiusInPx * 2)
-                    ),
-                    size = Size(cornerRadiusInPx *2, cornerRadiusInPx*2)
-                )
+                    //draw top right corner
+                    drawLine(
+                        color = cornerColor,
+                        strokeWidth = strokeWidthInPx,
+                        start = scanSizeOffset.copy(x = scanSizeOffset.x + scanSize.width - cornerRadiusInPx),
+                        end = scanSizeOffset.copy(x = scanSizeOffset.x + scanSize.width - strokeLengthInPx)
+                    )
 
-            }
+                    drawLine(
+                        color = cornerColor,
+                        strokeWidth = strokeWidthInPx,
+                        start = scanSizeOffset.copy(
+                            scanSizeOffset.x + scanSize.width,
+                            scanSizeOffset.y + cornerRadiusInPx
+                        ),
+                        end = scanSizeOffset.copy(
+                            scanSizeOffset.x + scanSize.width,
+                            scanSizeOffset.y + cornerRadiusInPx + strokeLengthInPx
+                        )
+                    )
+
+                    drawArc(
+                        color = cornerColor,
+                        startAngle = 0f,
+                        sweepAngle = -90f,
+                        useCenter = false,
+                        style = Stroke(width = strokeWidthInPx),
+                        topLeft = scanSizeOffset.copy(
+                            x = scanSizeOffset.x + scanSize.width - (cornerRadiusInPx * 2),
+                            y = scanSizeOffset.y
+                        ),
+                        size = Size(cornerRadiusInPx * 2, cornerRadiusInPx * 2)
+
+                    )
+
+
+                    //draw bottom left corner
+                    drawLine(
+                        color = cornerColor,
+                        strokeWidth = strokeWidthInPx,
+                        start = scanSizeOffset.copy(
+                            y = scanSizeOffset.y + scanSize.height - cornerRadiusInPx,
+                        ),
+                        end = scanSizeOffset.copy(
+                            y = scanSizeOffset.y + scanSize.height - cornerRadiusInPx - strokeLengthInPx,
+                        )
+                    )
+
+                    drawLine(
+                        color = cornerColor,
+                        strokeWidth = strokeWidthInPx,
+                        start = scanSizeOffset.copy(
+                            y = scanSizeOffset.y + scanSize.height,
+                            x = scanSizeOffset.x + cornerRadiusInPx
+                        ),
+                        end = scanSizeOffset.copy(
+                            y = scanSizeOffset.y + scanSize.height,
+                            x = scanSizeOffset.x + cornerRadiusInPx + strokeLengthInPx
+                        )
+                    )
+                    drawArc(
+                        color = cornerColor,
+                        startAngle = 90f,
+                        sweepAngle = 90f,
+                        useCenter = false,
+                        style = Stroke(width = strokeWidthInPx),
+                        topLeft = scanSizeOffset.copy(
+                            y = scanSizeOffset.y + scanSize.height - (cornerRadiusInPx * 2),
+                            x = scanSizeOffset.x
+                        ),
+                        size = Size(cornerRadiusInPx * 2, cornerRadiusInPx * 2)
+                    )
+
+                    // draw bottom right corner
+                    drawLine(
+                        color = cornerColor,
+                        strokeWidth = strokeWidthInPx,
+                        start = scanSizeOffset.copy(
+                            x = scanSizeOffset.x + scanSize.width - cornerRadiusInPx,
+                            y = scanSizeOffset.y + scanSize.height,
+                        ),
+                        end = scanSizeOffset.copy(
+                            x = scanSizeOffset.x + scanSize.width - cornerRadiusInPx - strokeLengthInPx,
+                            y = scanSizeOffset.y + scanSize.height,
+                        )
+                    )
+
+                    drawLine(
+                        color = cornerColor,
+                        strokeWidth = strokeWidthInPx,
+                        start = scanSizeOffset.copy(
+                            x = scanSizeOffset.x + scanSize.width,
+                            y = scanSizeOffset.y + scanSize.height - cornerRadiusInPx
+                        ),
+                        end = scanSizeOffset.copy(
+                            x = scanSizeOffset.x + scanSize.width,
+                            y = scanSizeOffset.y + scanSize.height - cornerRadiusInPx - strokeLengthInPx
+                        )
+                    )
+
+                    drawArc(
+                        color = cornerColor,
+                        startAngle = 0f,
+                        sweepAngle = 90f,
+                        useCenter = false,
+                        style = Stroke(width = strokeWidthInPx),
+                        topLeft = scanSizeOffset.copy(
+                            y = scanSizeOffset.y + scanSize.height - (cornerRadiusInPx * 2),
+                            x = scanSizeOffset.x + scanSize.width - (cornerRadiusInPx * 2)
+                        ),
+                        size = Size(cornerRadiusInPx * 2, cornerRadiusInPx * 2)
+                    )
+                }
+//            }
 
             if (state.showCameraRational) {
                 CameraRationale(
@@ -360,7 +370,8 @@ fun QRScanScreen(
                     )
 
                     Text(
-                        text = "Loading..."
+                        text = "Loading...",
+                        color = Color.White
                     )
                 }
             }

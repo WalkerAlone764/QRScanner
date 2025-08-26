@@ -18,17 +18,21 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
@@ -37,8 +41,11 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.withStarted
@@ -109,6 +116,18 @@ fun QRScanScreen(
     state: QRScanState,
     onAction: (QRScanAction) -> Unit,
 ) {
+    val textMeasurer = rememberTextMeasurer()
+    val textToDraw = "Point your camera at a QR code"
+    val textStyle = androidx.compose.ui.text.TextStyle(
+        color = Color.White,
+        fontSize = 18.sp, // You can adjust the font size
+        textAlign = TextAlign.Center,
+
+    )
+    val measuredText = textMeasurer.measure(
+        text = textToDraw,
+        style = textStyle
+    )
     Scaffold { innerPadding ->
         ContentWithBottomMessageBar(
             modifier = Modifier
@@ -160,7 +179,7 @@ fun QRScanScreen(
 
                 drawRoundRect(
                     color = Color.Transparent,
-                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(
+                    cornerRadius = CornerRadius(
                         x = with(density) { radius.toPx() },
                         y = with(density) { radius.toPx() }
                     ),
@@ -169,6 +188,13 @@ fun QRScanScreen(
                     blendMode = BlendMode.Clear
                 )
 
+                drawText(
+                    textLayoutResult = measuredText,
+                    topLeft = scanSizeOffset.copy(
+                        y = scanSizeOffset.y - 65.dp.toPx(),
+                        x = (size.width / 2f) - (measuredText.size.width / 2f)
+                    )
+                )
 
                 //draw top left corner
                 drawLine(
@@ -326,7 +352,17 @@ fun QRScanScreen(
                     .fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    CircularProgressIndicator(
+                        color = Color.White
+                    )
+
+                    Text(
+                        text = "Loading..."
+                    )
+                }
             }
         }
 

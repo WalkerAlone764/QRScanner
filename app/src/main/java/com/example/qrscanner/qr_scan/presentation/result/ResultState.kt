@@ -10,6 +10,7 @@ import com.example.qrscanner.qr_scan.data.model.BarcodeWifiResultWrapper
 import com.example.qrscanner.qr_scan.domain.model.BarcodeType
 
 data class ResultState(
+    val isPreview: Boolean = false,
     val type: BarcodeType = BarcodeType.TEXT,
     val bitmap: Bitmap? = null,
     val textResultWrapper: BarcodeTextResultWrapper? = null,

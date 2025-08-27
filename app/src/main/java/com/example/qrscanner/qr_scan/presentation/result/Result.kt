@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,10 +35,12 @@ import androidx.compose.ui.platform.Clipboard
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.qrscanner.R
 import com.example.qrscanner.core.presentation.util.ObserveAsEvents
 import com.example.qrscanner.core.ui.theme.QRScannerTheme
 import com.example.qrscanner.qr_scan.domain.model.BarcodeType
@@ -108,6 +111,7 @@ fun ResultScreen(
     Scaffold(
         topBar = {
             ResultAppBar(
+                title = if (state.isPreview) "Preview" else stringResource(R.string.scan_result),
                 onClickBack = onClickBack
             )
         }
@@ -117,7 +121,6 @@ fun ResultScreen(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.onSurface)
                 .padding(innerPadding)
-                .padding(top = 22.dp)
                 .padding(horizontal = 18.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -125,6 +128,7 @@ fun ResultScreen(
 
             Box(
                 modifier = Modifier
+                    .offset(y = (-100).dp)
                     .wrapContentSize(),
                 contentAlignment = Alignment.TopCenter
             ) {

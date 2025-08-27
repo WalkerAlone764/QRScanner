@@ -52,7 +52,7 @@ class ResultViewModel(
 
     init {
         val type = route.type
-        _state.update { it.copy(type = type) }
+        _state.update { it.copy(type = type, isPreview = route.isPreview) }
         when (type) {
             BarcodeType.LINK -> {
                 val linkWrapper = Json.decodeFromString<BarcodeLinkResultWrapper>(route.value)

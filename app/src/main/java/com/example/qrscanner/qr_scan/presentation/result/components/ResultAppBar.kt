@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -25,6 +24,7 @@ import com.example.qrscanner.core.ui.theme.onOverlay
 
 @Composable
 fun ResultAppBar(
+    title: String,
     modifier: Modifier = Modifier,
     onClickBack: () -> Unit
 ) {
@@ -47,14 +47,14 @@ fun ResultAppBar(
         },
         title = {
             Text(
-                text = stringResource(R.string.scan_result),
+                text = title,
                 style = MaterialTheme.typography.titleMedium.copy(
                     color = MaterialTheme.colorScheme.onOverlay
                 )
             )
         }
     )
-    
+
 }
 
 @Preview
@@ -66,6 +66,7 @@ private fun Preview() {
                 .background(MaterialTheme.colorScheme.onSurface)
         ) {
             ResultAppBar(
+                title = stringResource(R.string.scan_result),
                 onClickBack = {}
             )
         }

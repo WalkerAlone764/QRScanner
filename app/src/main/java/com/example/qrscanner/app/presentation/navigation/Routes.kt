@@ -7,9 +7,6 @@ import kotlinx.serialization.Serializable
 sealed interface Routes {
 
     @Serializable
-    data object Home : Routes
-
-    @Serializable
     data object Scan : Routes
 
     @Serializable
@@ -23,4 +20,22 @@ sealed interface Routes {
 
     @Serializable
     data object Reset : Routes
+
+    @Serializable
+    data object TextQR : Routes
+
+    @Serializable
+    data object LinkQR: Routes
+
+    @Serializable
+    data object ContactQR: Routes
+
+    @Serializable
+    data object PhoneNumberQR: Routes
+
+    @Serializable
+    data object GeoLocationQR: Routes
+
+    @Serializable
+    data object WifiQR: Routes
 }

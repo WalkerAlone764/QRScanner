@@ -21,24 +21,31 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.qrscanner.core.ui.theme.QRScannerTheme
+import com.example.qrscanner.core.ui.theme.onSurfaceDisabled
 
 @Composable
 fun CircularButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     textStyle: TextStyle = MaterialTheme.typography.labelLarge,
     textColor: Color = MaterialTheme.colorScheme.onSurface,
+    disabledTextColor: Color = MaterialTheme.colorScheme.onSurfaceDisabled,
+    backgroundColor: Color = Color.White,
+    disabledBackgroundColor: Color = MaterialTheme.colorScheme.surface,
     leftIcon: @Composable (() -> Unit)? = null,
 ) {
 
     Row(
         modifier = Modifier
             .clip(RoundedCornerShape(100))
-            .background(Color.White)
-            .clickable(onClick = onClick)
+            .background(
+                if (enabled) backgroundColor else disabledBackgroundColor
+            )
+            .clickable(onClick = onClick, enabled = enabled)
             .padding(
-                vertical = 12.dp, horizontal = 18.dp
+                vertical = 8.dp, horizontal = 18.dp
             )
             .heightIn(
                 min = 12.dp
@@ -51,7 +58,7 @@ fun CircularButton(
         leftIcon?.invoke()
         Text(
             text = text, style = textStyle.copy(
-                color = textColor
+                color = if (enabled) textColor else disabledTextColor
             )
         )
     }
@@ -65,6 +72,7 @@ private fun Preview() {
         Row {
             CircularButton(
                 onClick = {},
+                enabled = false,
                 leftIcon = {
                     Icon(
                         imageVector = Icons.Default.Check,

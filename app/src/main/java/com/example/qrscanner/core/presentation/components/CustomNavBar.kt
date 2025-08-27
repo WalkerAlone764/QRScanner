@@ -1,6 +1,5 @@
-package com.example.qrscanner.qr_scan.presentation.components
+package com.example.qrscanner.core.presentation.components
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,6 +16,7 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
@@ -78,33 +78,13 @@ fun CustomNavBar(
             )
         }
 
-//        IconButton(
-//            onClick = {},
-//            modifier = Modifier
-//                .drawBehind {
-//                    drawCircle(
-//                        color = backgroundColor,
-//                        center = this.center,
-//                        radius = 32.dp.toPx()
-//                    )
-//                }
-//        ) {
-//            Icon(
-//                imageVector = ImageVector.vectorResource(R.drawable.ic_scan),
-//                contentDescription = null,
-//                modifier = Modifier
-//                    .scale(1.2f)
-//
-//            )
-//        }
-
         Box(
             modifier = Modifier,
-            contentAlignment = androidx.compose.ui.Alignment.Center
+            contentAlignment = Alignment.Center
         ) {
             Box(
                 modifier = Modifier
-                    .align(androidx.compose.ui.Alignment.Center)
+                    .align(Alignment.Center)
                     .size(50.dp)
                     .scale(1.4f)
                     .clip(RoundedCornerShape(50))
@@ -138,8 +118,6 @@ fun CustomNavBar(
             },
             colors = IconButtonDefaults.iconButtonColors(
                 containerColor = if (currentDestination?.hierarchy?.any {
-//                    Log.d("TAG", "CustomNavBar: ${navController.currentBackStackEntry?.toRoute<Routes>()}")
-                        Log.d("TAG", "CustomNavBar: ${it.route}")
                         it.hasRoute(Routes.Create::class)
                     } == true) {
                     MaterialTheme.colorScheme.linkBackground.copy(0.4f)

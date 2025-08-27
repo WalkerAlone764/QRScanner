@@ -62,3 +62,6 @@ val ColorScheme.onOverlay: Color
 
 val ColorScheme.linkBackground: Color
     get() = LaserLemon
+
+val ColorScheme.onSurfaceDisabled: Color
+    get() = Color(0xff8C99A2)

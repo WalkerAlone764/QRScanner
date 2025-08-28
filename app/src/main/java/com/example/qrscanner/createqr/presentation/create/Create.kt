@@ -1,5 +1,6 @@
 package com.example.qrscanner.createqr.presentation.create
 
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -7,9 +8,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.qrscanner.core.presentation.util.ObserveAsEvents
 import com.example.qrscanner.core.ui.theme.QRScannerTheme
@@ -22,6 +26,23 @@ fun CreateRoot(
     viewModel: CreateViewModel = viewModel(),
     onNavigateToCreate: (QRType) -> Unit
 ) {
+
+    val view = LocalView.current
+    val activity = LocalActivity.current
+
+    DisposableEffect(true) {
+        val window = activity?.window
+        window?.let {
+            // For dark icons on a light status bar:
+            WindowCompat.getInsetsController(it, view).isAppearanceLightStatusBars = true
+            WindowCompat.getInsetsController(it, view).isAppearanceLightNavigationBars = false
+            // For light icons on a dark status bar:
+            // WindowCompat.getInsetsController(it, view).isAppearanceLightStatusBars = false
+        }
+
+        onDispose {
+        }
+    }
 
     ObserveAsEvents(viewModel.event) { event ->
         when (event) {

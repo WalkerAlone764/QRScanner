@@ -29,6 +29,8 @@ fun CustomTextField(
     onValueChange: (String) -> Unit,
     placeholder: String,
     modifier: Modifier = Modifier,
+    maxLine: Int = Int.MAX_VALUE,
+    singleLine: Boolean = false
 ) {
 
     var isFocus by remember {
@@ -37,6 +39,8 @@ fun CustomTextField(
     BasicTextField(
         value = text,
         onValueChange = onValueChange,
+        maxLines = maxLine,
+        singleLine = singleLine,
         decorationBox = { innerTextField ->
             Box(
                 modifier = Modifier

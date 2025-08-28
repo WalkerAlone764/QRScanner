@@ -20,7 +20,9 @@ import com.example.qrscanner.app.presentation.navigation.Routes
 import com.example.qrscanner.app.presentation.navigation.currentRoute
 import com.example.qrscanner.core.presentation.components.CustomNavBar
 import com.example.qrscanner.createqr.presentation.create.CreateRoot
+import com.example.qrscanner.createqr.presentation.linkqr.LinkQRCreationRoot
 import com.example.qrscanner.createqr.presentation.textqr.TextQRCreationRoot
+import com.example.qrscanner.qr_scan.data.model.BarcodeLinkResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodeTextResultWrapper
 import com.example.qrscanner.qr_scan.domain.model.BarcodeType
 import com.example.qrscanner.qr_scan.presentation.result.ResultRoot
@@ -101,7 +103,26 @@ fun SetupNavigation(
                 )
             }
 
-            composable<Routes.LinkQR> { }
+            composable<Routes.LinkQR> {
+                LinkQRCreationRoot(
+                    mainPaddingValues = innerPadding,
+                    onNavigateBack = {
+                        navController.navigateUp()
+                    },
+                    onNavigateToPreviewScreen = {
+                        navController.navigate(
+                            Routes.Result(
+                                true,
+                                BarcodeType.LINK,
+                                Json.encodeToString(BarcodeLinkResultWrapper(
+                                    title = it,
+                                    url = it
+                                ))
+                            )
+                        )
+                    }
+                )
+            }
 
             composable<Routes.ContactQR> { }
 

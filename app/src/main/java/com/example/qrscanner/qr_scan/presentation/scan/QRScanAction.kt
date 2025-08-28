@@ -8,6 +8,8 @@ sealed interface QRScanAction {
     data class OnRequestPermission(val isGranted: Boolean) : QRScanAction
     data class OnBindCamera(val context: Context, val lifecycleOwner: LifecycleOwner) : QRScanAction
 
+    data object UnBindCamera: QRScanAction
+
     data object OnClickCloseApp : QRScanAction
 
     data object OnClickGrantAccess : QRScanAction

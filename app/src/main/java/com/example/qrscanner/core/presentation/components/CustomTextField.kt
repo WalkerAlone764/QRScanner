@@ -3,12 +3,12 @@ package com.example.qrscanner.core.presentation.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,7 +30,9 @@ fun CustomTextField(
     placeholder: String,
     modifier: Modifier = Modifier,
     maxLine: Int = Int.MAX_VALUE,
-    singleLine: Boolean = false
+    singleLine: Boolean = false,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default
 ) {
 
     var isFocus by remember {
@@ -47,7 +49,7 @@ fun CustomTextField(
                     .fillMaxWidth(),
                 contentAlignment = androidx.compose.ui.Alignment.CenterStart
             ) {
-                if (text.isEmpty() && !isFocus){
+                if (text.isEmpty() && !isFocus) {
                     Text(
                         text = placeholder,
                         style = MaterialTheme.typography.bodyLarge.copy(
@@ -62,6 +64,8 @@ fun CustomTextField(
                 }
             }
         },
+        keyboardActions = keyboardActions,
+        keyboardOptions = keyboardOptions,
         modifier = modifier
             .onFocusChanged {
                 isFocus = it.isFocused

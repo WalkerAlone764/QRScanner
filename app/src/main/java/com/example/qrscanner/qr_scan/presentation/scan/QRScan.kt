@@ -28,8 +28,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -40,12 +42,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.withStarted
@@ -55,6 +59,7 @@ import com.example.qrscanner.core.ui.theme.QRScannerTheme
 import com.example.qrscanner.qr_scan.domain.model.BarcodeType
 import com.example.qrscanner.qr_scan.presentation.scan.components.CameraRationale
 import com.example.qrscanner.qr_scan.presentation.scan.components.ErrorMessageDialog
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -63,7 +68,7 @@ fun QRScanRoot(
     viewModel: QRScanViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val isScanLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val isScanLoading by viewModel.isLoading.collectAsStateWithLifecycle(false)
 
     val requestCameraPermission =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -73,13 +78,37 @@ fun QRScanRoot(
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
     val activity = LocalActivity.current
+    val view = LocalView.current
+    val scope = rememberCoroutineScope()
 
+    DisposableEffect(true) {
+        val window = activity?.window
+        window?.let {
+            // For dark icons on a light status bar:
+            WindowCompat.getInsetsController(it, view).isAppearanceLightStatusBars = false
+            WindowCompat.getInsetsController(it, view).isAppearanceLightNavigationBars = true
+            // For light icons on a dark status bar:
+            // WindowCompat.getInsetsController(it, view).isAppearanceLightStatusBars = false
+        }
 
-    LaunchedEffect(lifecycleOwner) {
-        lifecycleOwner.lifecycle.withStarted {
-            viewModel.onAction(QRScanAction.OnBindCamera(context, lifecycleOwner))
+        onDispose {
+
         }
     }
+
+
+    DisposableEffect(lifecycleOwner) {
+       scope.launch {
+           lifecycleOwner.lifecycle.withStarted {
+               viewModel.onAction(QRScanAction.OnBindCamera(context, lifecycleOwner))
+           }
+       }
+        onDispose {
+            viewModel.onAction(QRScanAction.UnBindCamera)
+        }
+
+    }
+
 
     ObserveAsEvents(viewModel.event) { event ->
         when (event) {
@@ -102,6 +131,10 @@ fun QRScanRoot(
 
     LaunchedEffect(Unit) {
         requestCameraPermission.launch(Manifest.permission.CAMERA)
+    }
+
+    LaunchedEffect(isScanLoading) {
+        Log.d("isLoading:", isScanLoading.toString())
     }
 
     QRScanScreen(
@@ -177,7 +210,7 @@ fun QRScanScreen(
                     (size.height - scanSize.height) / 2
                 )
 
-//                if (!isLoading) {
+                if (!isLoading) {
                     drawRoundRect(
                         color = Color.Transparent,
                         cornerRadius = CornerRadius(
@@ -336,7 +369,7 @@ fun QRScanScreen(
                         size = Size(cornerRadiusInPx * 2, cornerRadiusInPx * 2)
                     )
                 }
-//            }
+            }
 
             if (state.showCameraRational) {
                 CameraRationale(

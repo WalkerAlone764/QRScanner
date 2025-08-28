@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
 interface QRAnalysis {
-    val isLoading: StateFlow<Boolean>
+    val isLoading: SharedFlow<Boolean>
 
     val result: SharedFlow<QRAnalysisResult>
 

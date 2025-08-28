@@ -19,10 +19,14 @@ import androidx.navigation.toRoute
 import com.example.qrscanner.app.presentation.navigation.Routes
 import com.example.qrscanner.app.presentation.navigation.currentRoute
 import com.example.qrscanner.core.presentation.components.CustomNavBar
+import com.example.qrscanner.createqr.presentation.contactqr.ContactQRCreationRoot
 import com.example.qrscanner.createqr.presentation.create.CreateRoot
 import com.example.qrscanner.createqr.presentation.linkqr.LinkQRCreationRoot
+import com.example.qrscanner.createqr.presentation.phoneqr.PhoneQRCreationRoot
 import com.example.qrscanner.createqr.presentation.textqr.TextQRCreationRoot
+import com.example.qrscanner.qr_scan.data.model.BarcodeContactResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodeLinkResultWrapper
+import com.example.qrscanner.qr_scan.data.model.BarcodePhoneResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodeTextResultWrapper
 import com.example.qrscanner.qr_scan.domain.model.BarcodeType
 import com.example.qrscanner.qr_scan.presentation.result.ResultRoot
@@ -124,11 +128,48 @@ fun SetupNavigation(
                 )
             }
 
-            composable<Routes.ContactQR> { }
+            composable<Routes.ContactQR> {
+                ContactQRCreationRoot(
+                    mainPaddingValues = innerPadding,
+                    onNavigateBack = {
+                        navController.navigateUp()
+                    },
+                    onNavigateToPreviewScreen = { name, email, phone ->
+                        navController.navigate(
+                            Routes.Result(
+                                true,
+                                BarcodeType.CONTACT,
+                                Json.encodeToString(BarcodeContactResultWrapper(
+                                    formattedName = name,
+                                    email = email,
+                                    phone = phone
+                                ))
+                            )
+                        )
+                    }
+                )
+            }
 
-            composable<Routes.ContactQR> { }
 
-            composable<Routes.PhoneNumberQR> { }
+            composable<Routes.PhoneNumberQR> {
+                PhoneQRCreationRoot(
+                    mainPaddingValues = innerPadding,
+                    onNavigateBack = { navController.navigateUp() },
+                    onNavigateToPreviewScreen = { number ->
+                        navController.navigate(
+                            Routes.Result(
+                                isPreview = true,
+                                type = BarcodeType.PHONE_NUMBER,
+                                value = Json.encodeToString(
+                                    BarcodePhoneResultWrapper(
+                                        phone = number
+                                    )
+                                )
+                            )
+                        )
+                    }
+                )
+            }
 
             composable<Routes.GeoLocationQR> { }
 

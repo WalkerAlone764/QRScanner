@@ -15,8 +15,10 @@ import com.example.qrscanner.R
 import com.example.qrscanner.core.presentation.util.UiText
 import com.example.qrscanner.qr_scan.domain.QRAnalysis
 import com.example.qrscanner.qr_scan.domain.model.QRAnalysisResult
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -42,9 +44,30 @@ class QRScanViewModel(
             /** Load initial data here **/
             hasLoadedInitialData = true
         }
-    }.stateIn(
+    }
+        .onStart {
+            qrAnalysis
+                .result
+                .distinctUntilChanged()
+                .onEach { result ->
+                    //handle data
+                    Log.d("QRScanViewModel", "scan result : $result")
+                    when (result) {
+                        is QRAnalysisResult.Error -> {
+                            _state.update { it.copy(hasError = true) }
+                        }
+
+                        is QRAnalysisResult.Success -> {
+                            _state.update { it.copy(hasError = false) }
+                            _event.send(QRScanEvent.OnSuccess(result.type, result.value))
+                        }
+                    }
+                }
+                .launchIn(viewModelScope)
+        }
+        .stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000L),
+        started = SharingStarted.WhileSubscribed(1_500L),
         initialValue = QRScanState()
     )
 
@@ -52,27 +75,6 @@ class QRScanViewModel(
     val event = _event.receiveAsFlow()
 
     val isLoading = qrAnalysis.isLoading
-    init {
-        qrAnalysis
-            .result
-            .distinctUntilChanged()
-            .onEach { result ->
-                //handle data
-                Log.d("QRScanViewModel", "scan result : $result")
-                when (result) {
-                    is QRAnalysisResult.Error -> {
-                        _state.update { it.copy(hasError = true) }
-                    }
-
-                    is QRAnalysisResult.Success -> {
-                        //TODO(handle the success)
-                        _state.update { it.copy(hasError = false) }
-                        _event.send(QRScanEvent.OnSuccess(result.type, result.value))
-                    }
-                }
-            }
-            .launchIn(viewModelScope)
-    }
 
 
     private val cameraPreviewUseCase = Preview.Builder().build().apply {
@@ -85,31 +87,17 @@ class QRScanViewModel(
         }
     }
 
+    private var processCameraProvider: ProcessCameraProvider? = null
     private val imageCapture = ImageCapture.Builder().build()
 
     private val imageAnalysis = ImageAnalysis.Builder()
         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
         .build()
         .apply {
-
             setAnalyzer(
                 Executors.newSingleThreadExecutor(), qrAnalysis as ImageAnalysis.Analyzer
             )
         }
-
-    init {
-        viewModelScope.launch {
-            state
-                .map { it.surfaceRequest }
-                .distinctUntilChanged()
-                .collect {
-                    if (it != null) {
-                        imageCapture // This seems to be unused, imageCapture is not being consumed.
-                        // Consider if it's needed or if this collect block can be removed/repurposed.
-                    }
-                }
-        }
-    }
 
     fun onAction(action: QRScanAction) {
         when (action) {
@@ -117,6 +105,14 @@ class QRScanViewModel(
             is QRScanAction.OnBindCamera -> onBindCamera(action.context, action.lifecycleOwner)
             QRScanAction.OnClickCloseApp -> onClickCloseApp()
             QRScanAction.OnClickGrantAccess -> onClickGrantAccess()
+            QRScanAction.UnBindCamera -> unbindCamera()
+        }
+    }
+
+    private fun unbindCamera() {
+        viewModelScope.launch(NonCancellable) {
+            processCameraProvider?.unbindAll()
+            processCameraProvider = null
         }
     }
 
@@ -136,6 +132,7 @@ class QRScanViewModel(
         context: Context, lifecycleOwner: LifecycleOwner
     ) {
         viewModelScope.launch {
+            delay(1000)
             bindToCamera(context, lifecycleOwner)
         }
     }
@@ -155,9 +152,10 @@ class QRScanViewModel(
     }
 
     suspend fun bindToCamera(appContext: Context, lifecycleOwner: LifecycleOwner) {
-        val processCameraProvider = ProcessCameraProvider.awaitInstance(appContext)
-        processCameraProvider.unbindAll() // Unbind existing use cases before rebinding
-        processCameraProvider.bindToLifecycle(
+        processCameraProvider?.unbindAll()
+         processCameraProvider = ProcessCameraProvider.awaitInstance(appContext)
+        processCameraProvider?.unbindAll() // Unbind existing use cases before rebinding
+        processCameraProvider?.bindToLifecycle(
             lifecycleOwner,
             CameraSelector.DEFAULT_BACK_CAMERA,
             cameraPreviewUseCase,
@@ -169,7 +167,9 @@ class QRScanViewModel(
         try {
             awaitCancellation()
         } finally {
-            processCameraProvider.unbindAll()
+            viewModelScope.launch(NonCancellable) {
+                processCameraProvider?.unbindAll()
+            }
         }
     }
 

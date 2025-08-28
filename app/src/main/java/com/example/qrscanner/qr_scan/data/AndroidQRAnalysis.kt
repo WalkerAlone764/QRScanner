@@ -43,9 +43,9 @@ class AndroidQRAnalysis(
 ) : QRAnalysis, ImageAnalysis.Analyzer {
     private val scope = CoroutineScope(Dispatchers.Main)
 
-    private val _isLoading = MutableStateFlow<Boolean>(false)
-    override val isLoading: StateFlow<Boolean>
-        get() = _isLoading.asStateFlow()
+    private val _isLoading = MutableSharedFlow<Boolean>()
+    override val isLoading: SharedFlow<Boolean>
+        get() = _isLoading.asSharedFlow()
 
     private val _result = MutableSharedFlow<QRAnalysisResult>()
     override val result: SharedFlow<QRAnalysisResult>
@@ -99,11 +99,12 @@ class AndroidQRAnalysis(
                         }
 
                         scope.launch {
-                            _isLoading.update { true }
+                            _isLoading.emit(true)
 
                             delay(1000)
                             barcodes?.firstOrNull()?.let { barcode ->
                                 val valueType = barcode.valueType
+                                Log.d("barcode type",valueType.toString())
                                 when (valueType) {
                                     Barcode.TYPE_GEO -> {
                                         val type = BarcodeType.GEOLOCATION
@@ -112,13 +113,14 @@ class AndroidQRAnalysis(
                                             lat = geo?.lat, long = geo?.lng
                                         )
                                         val resultAsJson = Json.encodeToString(result)
-
+Log.d("barcode json", resultAsJson)
                                         _result.emit(
                                             QRAnalysisResult.Success(
                                                 type = type,
                                                 value = resultAsJson
                                             )
                                         )
+
                                     }
 
                                     Barcode.TYPE_URL -> {
@@ -172,9 +174,6 @@ class AndroidQRAnalysis(
                                         val contactInfo = barcode.contactInfo
                                         val result = BarcodeContactResultWrapper(
                                             formattedName = contactInfo?.name?.formattedName,
-                                            prefix = contactInfo?.name?.prefix,
-                                            middle = contactInfo?.name?.middle,
-                                            last = contactInfo?.name?.last,
                                             phone = contactInfo?.phones?.firstOrNull()?.number,
                                             email = contactInfo?.emails?.firstOrNull()?.address
                                         )
@@ -225,22 +224,33 @@ class AndroidQRAnalysis(
                                             )
                                         )
 
+
+
                                     }
                                 }
+
+                                _isLoading.emit(false)
+                                Log.d("barcode", "success")
+                                imageProxy.close()
                             }
                         }
 
                     }
                 }
                 .addOnFailureListener { exception ->
+                    Log.d("barcode", "fail")
+                    imageProxy.close()
                     scope.launch {
                         _result.emit(QRAnalysisResult.Error(exception))
+                        _isLoading.emit(false)
                     }
+
                 }
                 .addOnCompleteListener {
                     imageProxy.close()
-                    _isLoading.update { false }
+                    _isLoading.tryEmit(false)
                 }
+
         }
     }
 }

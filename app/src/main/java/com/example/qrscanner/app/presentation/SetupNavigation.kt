@@ -21,10 +21,12 @@ import com.example.qrscanner.app.presentation.navigation.currentRoute
 import com.example.qrscanner.core.presentation.components.CustomNavBar
 import com.example.qrscanner.createqr.presentation.contactqr.ContactQRCreationRoot
 import com.example.qrscanner.createqr.presentation.create.CreateRoot
+import com.example.qrscanner.createqr.presentation.geolocationqr.GeolocationQRCreationRoot
 import com.example.qrscanner.createqr.presentation.linkqr.LinkQRCreationRoot
 import com.example.qrscanner.createqr.presentation.phoneqr.PhoneQRCreationRoot
 import com.example.qrscanner.createqr.presentation.textqr.TextQRCreationRoot
 import com.example.qrscanner.qr_scan.data.model.BarcodeContactResultWrapper
+import com.example.qrscanner.qr_scan.data.model.BarcodeGeolocationResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodeLinkResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodePhoneResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodeTextResultWrapper
@@ -58,7 +60,7 @@ fun SetupNavigation(
                 QRScanRoot(
                     onNavigateToResult = { type, value ->
                         navController.navigate(
-                            Routes.Result(false,type, value)
+                            Routes.Result(false, type, value)
                         )
                     })
             }
@@ -118,10 +120,12 @@ fun SetupNavigation(
                             Routes.Result(
                                 true,
                                 BarcodeType.LINK,
-                                Json.encodeToString(BarcodeLinkResultWrapper(
-                                    title = it,
-                                    url = it
-                                ))
+                                Json.encodeToString(
+                                    BarcodeLinkResultWrapper(
+                                        title = it,
+                                        url = it
+                                    )
+                                )
                             )
                         )
                     }
@@ -139,11 +143,13 @@ fun SetupNavigation(
                             Routes.Result(
                                 true,
                                 BarcodeType.CONTACT,
-                                Json.encodeToString(BarcodeContactResultWrapper(
-                                    formattedName = name,
-                                    email = email,
-                                    phone = phone
-                                ))
+                                Json.encodeToString(
+                                    BarcodeContactResultWrapper(
+                                        formattedName = name,
+                                        email = email,
+                                        phone = phone
+                                    )
+                                )
                             )
                         )
                     }
@@ -171,7 +177,28 @@ fun SetupNavigation(
                 )
             }
 
-            composable<Routes.GeoLocationQR> { }
+            composable<Routes.GeoLocationQR> {
+                GeolocationQRCreationRoot(
+                    mainPaddingValues = innerPadding,
+                    onNavigateBack = {
+                        navController.navigateUp()
+                    },
+                    onNavigateToPreviewScreen = { lat, long ->
+                        navController.navigate(
+                            Routes.Result(
+                                isPreview = true,
+                                type = BarcodeType.GEOLOCATION,
+                                value = Json.encodeToString(
+                                    BarcodeGeolocationResultWrapper(
+                                        lat = lat.toDoubleOrNull(),
+                                        long = long.toDoubleOrNull()
+                                    )
+                                )
+                            )
+                        )
+                    }
+                )
+            }
 
             composable<Routes.WifiQR> { }
         }

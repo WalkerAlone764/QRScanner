@@ -3,6 +3,7 @@ package com.example.qrscanner.qr_scan.presentation.result
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -35,10 +37,12 @@ import androidx.compose.ui.platform.Clipboard
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.qrscanner.R
 import com.example.qrscanner.core.presentation.util.ObserveAsEvents
@@ -85,6 +89,31 @@ fun ResultRoot(
                     )
                 )
             }
+        }
+    }
+
+    val view = LocalView.current
+    val activity = LocalActivity.current
+
+    DisposableEffect(true) {
+        val window = activity?.window
+        window?.let {
+            // For dark icons on a light status bar:
+            WindowCompat.getInsetsController(it, view).isAppearanceLightStatusBars = false
+            WindowCompat.getInsetsController(it, view).isAppearanceLightNavigationBars = false
+            // For light icons on a dark status bar:
+            // WindowCompat.getInsetsController(it, view).isAppearanceLightStatusBars = false
+        }
+
+        onDispose {
+            window?.let {
+                // For dark icons on a light status bar:
+                WindowCompat.getInsetsController(it, view).isAppearanceLightStatusBars = true
+                WindowCompat.getInsetsController(it, view).isAppearanceLightNavigationBars = true
+                // For light icons on a dark status bar:
+                // WindowCompat.getInsetsController(it, view).isAppearanceLightStatusBars = false
+            }
+
         }
     }
 

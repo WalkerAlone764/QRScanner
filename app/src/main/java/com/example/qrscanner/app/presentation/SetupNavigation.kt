@@ -25,11 +25,13 @@ import com.example.qrscanner.createqr.presentation.geolocationqr.GeolocationQRCr
 import com.example.qrscanner.createqr.presentation.linkqr.LinkQRCreationRoot
 import com.example.qrscanner.createqr.presentation.phoneqr.PhoneQRCreationRoot
 import com.example.qrscanner.createqr.presentation.textqr.TextQRCreationRoot
+import com.example.qrscanner.createqr.presentation.wifiqr.WifiQRCreationRoot
 import com.example.qrscanner.qr_scan.data.model.BarcodeContactResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodeGeolocationResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodeLinkResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodePhoneResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodeTextResultWrapper
+import com.example.qrscanner.qr_scan.data.model.BarcodeWifiResultWrapper
 import com.example.qrscanner.qr_scan.domain.model.BarcodeType
 import com.example.qrscanner.qr_scan.presentation.result.ResultRoot
 import com.example.qrscanner.qr_scan.presentation.scan.QRScanRoot
@@ -200,7 +202,27 @@ fun SetupNavigation(
                 )
             }
 
-            composable<Routes.WifiQR> { }
+            composable<Routes.WifiQR> {
+                WifiQRCreationRoot(
+                    mainPaddingValues = innerPadding,
+                    onNavigateBack = {navController.navigateUp()},
+                    onNavigateToPreviewScreen = { ssid, password, encryptedType ->
+                        navController.navigate(
+                            Routes.Result(
+                                isPreview = true,
+                                type = BarcodeType.WIFI,
+                                value = Json.encodeToString(
+                                    BarcodeWifiResultWrapper(
+                                        ssid = ssid,
+                                        password = password,
+                                        encryption = encryptedType
+                                    )
+                                )
+                            )
+                        )
+                    }
+                )
+            }
         }
     }
 

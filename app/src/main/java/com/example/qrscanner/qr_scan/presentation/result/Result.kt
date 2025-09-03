@@ -6,6 +6,7 @@ import android.content.Intent
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,12 +32,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.Clipboard
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -145,9 +148,13 @@ fun ResultScreen(
             )
         }
     ) { innerPadding ->
+        val focusManager = LocalFocusManager.current
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .pointerInput(Unit) {
+                    detectTapGestures(onTap = { focusManager.clearFocus() })
+                }
                 .background(MaterialTheme.colorScheme.onSurface)
                 .padding(innerPadding)
                 .padding(horizontal = 18.dp),

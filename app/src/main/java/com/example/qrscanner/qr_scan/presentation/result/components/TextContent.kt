@@ -3,23 +3,28 @@ package com.example.qrscanner.qr_scan.presentation.result.components
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,16 +38,20 @@ fun ColumnScope.TextContent(
     text: String
 ) {
 
-    Text(
-        text = stringResource(R.string.text),
-        style = MaterialTheme.typography.titleMedium.copy(
-            color = MaterialTheme.colorScheme.onSurface
-        ),
-        modifier = Modifier
-            .align(Alignment.CenterHorizontally)
-    )
+    val context = LocalContext.current
+    var isFocus by remember {
+        mutableStateOf(false)
+    }
 
-    Spacer(modifier = Modifier.height(6.dp))
+    var title by rememberSaveable {
+        mutableStateOf("")
+    }
+
+    var textToShow by remember(isFocus, title) {
+        mutableStateOf(
+            if (isFocus || title.isNotEmpty()) title else context.getString(R.string.text)
+        )
+    }
 
     var isExpanded by remember { mutableStateOf(false) }
     var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
@@ -50,29 +59,74 @@ fun ColumnScope.TextContent(
         (textLayoutResult?.lineCount ?: 0) > DEFAULT_MINIMUM_LINE
     }
 
-    Text(
-        text = text,
-        maxLines = if (isExpanded) Int.MAX_VALUE else DEFAULT_MINIMUM_LINE + 1,
-        onTextLayout = { textLayoutResult = it },
-        overflow = TextOverflow.Ellipsis,
-        style = MaterialTheme.typography.bodyLarge.copy(
-            color = MaterialTheme.colorScheme.onSurface
+    BasicTextField(
+        value = textToShow,
+        onValueChange = {
+            title = it
+        },
+        readOnly = false,
+        enabled = true,
+        textStyle = MaterialTheme.typography.titleMedium.copy(
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center
         ),
+        decorationBox = { innerTextField ->
+
+            if (isFocus) {
+                if (title.isEmpty()) {
+                    Text(
+                        text = stringResource(R.string.text),
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                        ),
+                        modifier = Modifier
+                    )
+                } else {
+                    innerTextField()
+                }
+            } else {
+                innerTextField()
+            }
+        },
         modifier = Modifier
-            .animateContentSize()
+            .focusable(true)
+            .onFocusChanged {
+                isFocus = it.isFocused
+            }
     )
-    if (showExpandButton) {
+
+    Spacer(modifier = Modifier.height(6.dp))
+
+
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
         Text(
-            if (isExpanded) stringResource(R.string.show_less) else stringResource(R.string.show_more),
+            text = text,
+            maxLines = if (isExpanded) Int.MAX_VALUE else DEFAULT_MINIMUM_LINE + 1,
+            onTextLayout = { textLayoutResult = it },
+            overflow = TextOverflow.Ellipsis,
             style = MaterialTheme.typography.bodyLarge.copy(
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
             ),
             modifier = Modifier
-                .clickable {
-                    isExpanded = !isExpanded
-                }
+                .animateContentSize()
         )
+        if (showExpandButton) {
+            Text(
+                if (isExpanded) stringResource(R.string.show_less) else stringResource(R.string.show_more),
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.SemiBold,
+                ),
+                modifier = Modifier
+                    .clickable {
+                        isExpanded = !isExpanded
+                    }
+            )
+        }
     }
 }
 

@@ -26,6 +26,7 @@ import com.example.qrscanner.createqr.presentation.linkqr.LinkQRCreationRoot
 import com.example.qrscanner.createqr.presentation.phoneqr.PhoneQRCreationRoot
 import com.example.qrscanner.createqr.presentation.textqr.TextQRCreationRoot
 import com.example.qrscanner.createqr.presentation.wifiqr.WifiQRCreationRoot
+import com.example.qrscanner.history.presentation.HistoryRoot
 import com.example.qrscanner.qr_scan.data.model.BarcodeContactResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodeGeolocationResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodeLinkResultWrapper
@@ -89,8 +90,8 @@ fun SetupNavigation(
                 )
             }
 
-            composable<Routes.Reset> {
-
+            composable<Routes.History> {
+                HistoryRoot()
             }
 
             composable<Routes.TextQR> {
@@ -205,7 +206,7 @@ fun SetupNavigation(
             composable<Routes.WifiQR> {
                 WifiQRCreationRoot(
                     mainPaddingValues = innerPadding,
-                    onNavigateBack = {navController.navigateUp()},
+                    onNavigateBack = { navController.navigateUp() },
                     onNavigateToPreviewScreen = { ssid, password, encryptedType ->
                         navController.navigate(
                             Routes.Result(

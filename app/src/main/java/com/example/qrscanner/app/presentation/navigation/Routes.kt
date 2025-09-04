@@ -20,23 +20,23 @@ sealed interface Routes {
     data object Create : Routes
 
     @Serializable
-    data object Reset : Routes
+    data object History : Routes
 
     @Serializable
     data object TextQR : Routes
 
     @Serializable
-    data object LinkQR: Routes
+    data object LinkQR : Routes
 
     @Serializable
-    data object ContactQR: Routes
+    data object ContactQR : Routes
 
     @Serializable
-    data object PhoneNumberQR: Routes
+    data object PhoneNumberQR : Routes
 
     @Serializable
-    data object GeoLocationQR: Routes
+    data object GeoLocationQR : Routes
 
     @Serializable
-    data object WifiQR: Routes
+    data object WifiQR : Routes
 }

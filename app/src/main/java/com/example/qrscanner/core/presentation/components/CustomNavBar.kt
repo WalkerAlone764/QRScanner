@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -48,14 +49,17 @@ fun CustomNavBar(
     Row(
         modifier = modifier
             .navigationBarsPadding()
+            .padding(
+                bottom = 12.dp
+            )
             .background(Color.White, RoundedCornerShape(50)),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
 
         IconButton(
             onClick = {
-                navController.navigate(Routes.Reset) {
-                    popUpTo(Routes.Reset) {
+                navController.navigate(Routes.History) {
+                    popUpTo(Routes.History) {
                         inclusive = true
                     }
                 }
@@ -63,7 +67,7 @@ fun CustomNavBar(
             colors = IconButtonDefaults.iconButtonColors(
                 containerColor = if (
                     currentDestination?.hierarchy?.any {
-                        it.hasRoute(Routes.Reset::class)
+                        it.hasRoute(Routes.History::class)
                     } == true
                 ) {
                     MaterialTheme.colorScheme.linkBackground.copy(0.4f)

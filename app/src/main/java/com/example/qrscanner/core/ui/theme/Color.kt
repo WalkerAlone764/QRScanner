@@ -26,6 +26,8 @@ val MaroonFlush = Color(0xffB51D5C)
 val OrangeRoughy = Color(0xffC86017)
 val PersianBlue = Color(0xff1F44CD)
 
+val outline = Color(0xffCCD5DC)
+
 val ColorScheme.success: Color
     get() = Shamrock
 

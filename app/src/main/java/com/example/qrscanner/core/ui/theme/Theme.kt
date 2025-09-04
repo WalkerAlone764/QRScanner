@@ -9,7 +9,8 @@ private val LightColorScheme = lightColorScheme(
     surface = AquaHaze,
     onSurface = OuterSpace,
     onSurfaceVariant = ShuttleGray,
-    error = RedRibbon
+    error = RedRibbon,
+    outline = outline
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),

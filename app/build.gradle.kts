@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.jetbrains.kotlin.serialization)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 android {
@@ -37,6 +39,10 @@ android {
     buildFeatures {
         compose = true
     }
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }
 
 dependencies {
@@ -79,5 +85,10 @@ dependencies {
 
     //QR Generator
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+
+    // Database - Room
+    implementation(libs.room.ktx)
+    implementation(libs.room.runtime)
+    ksp(libs.room.compiler)
 
 }

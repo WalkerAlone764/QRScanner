@@ -26,12 +26,12 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.qrscanner.core.ui.theme.QRScannerTheme
-import com.example.qrscanner.createqr.presentation.create.model.QRType
-import com.example.qrscanner.createqr.presentation.create.model.qrTypeList
+import com.example.qrscanner.createqr.presentation.create.model.QRCodeDetails
+import com.example.qrscanner.createqr.presentation.create.model.qrCodeDetailsLists
 
 @Composable
 fun CreateItems(
-    onClickItem: (QRType) -> Unit,
+    onClickItem: (QRCodeDetails) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -41,9 +41,9 @@ fun CreateItems(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        items(qrTypeList) { qrItem ->
+        items(qrCodeDetailsLists) { qrItem ->
             Item(
-                qrType = qrItem,
+                qrCodeDetails = qrItem,
                 onClickItem = onClickItem,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -54,8 +54,8 @@ fun CreateItems(
 
 @Composable
 private fun Item(
-    qrType: QRType,
-    onClickItem: (QRType) -> Unit,
+    qrCodeDetails: QRCodeDetails,
+    onClickItem: (QRCodeDetails) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -63,7 +63,7 @@ private fun Item(
             .clip(RoundedCornerShape(18))
             .background(Color.White)
             .clickable {
-                onClickItem(qrType)
+                onClickItem(qrCodeDetails)
             }
             .padding(
                 horizontal = 12.dp,
@@ -80,12 +80,12 @@ private fun Item(
         ) {
 
             Image(
-                imageVector = ImageVector.vectorResource(qrType.icon),
+                imageVector = ImageVector.vectorResource(qrCodeDetails.icon),
                 contentDescription = null
             )
 
             Text(
-                text = qrType.name,
+                text = qrCodeDetails.type.title,
                 style = MaterialTheme.typography.titleSmall.copy(
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -99,7 +99,7 @@ private fun Item(
 private fun ItemPreview() {
     QRScannerTheme {
         Item(
-            qrType = qrTypeList.first(),
+            qrCodeDetails = qrCodeDetailsLists.first(),
             onClickItem = {}
         )
     }

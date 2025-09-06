@@ -19,12 +19,12 @@ import com.example.qrscanner.core.presentation.util.ObserveAsEvents
 import com.example.qrscanner.core.ui.theme.QRScannerTheme
 import com.example.qrscanner.createqr.presentation.components.CreateAppBar
 import com.example.qrscanner.createqr.presentation.create.components.CreateItems
-import com.example.qrscanner.createqr.presentation.create.model.QRType
+import com.example.qrscanner.createqr.presentation.create.model.QRCodeDetails
 
 @Composable
 fun CreateRoot(
     viewModel: CreateViewModel = viewModel(),
-    onNavigateToCreate: (QRType) -> Unit
+    onNavigateToCreate: (QRCodeDetails) -> Unit
 ) {
 
     val view = LocalView.current
@@ -47,7 +47,7 @@ fun CreateRoot(
     ObserveAsEvents(viewModel.event) { event ->
         when (event) {
             is CreateEvent.NavigateToCreate -> {
-                onNavigateToCreate(event.qrType)
+                onNavigateToCreate(event.qrCodeDetails)
             }
         }
     }

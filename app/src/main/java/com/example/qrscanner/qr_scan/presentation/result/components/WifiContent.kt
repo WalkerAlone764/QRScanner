@@ -31,6 +31,7 @@ fun ColumnScope.WifiContent(
     ssid: String,
     password: String,
     encryptionType: String,
+    onLossFocus: (String) -> Unit
 ) {
     val context = LocalContext.current
     var isFocus by remember {
@@ -80,6 +81,10 @@ fun ColumnScope.WifiContent(
             .focusable(true)
             .onFocusChanged {
                 isFocus = it.isFocused
+
+                if (!it.isFocused) {
+                    onLossFocus(text.ifEmpty { "Wi-Fi" })
+                }
             }
     )
 
@@ -116,7 +121,8 @@ private fun Preview() {
             WifiContent(
                 ssid = "wifi-5G",
                 password = "qweq!@FQ",
-                encryptionType = "WPA2"
+                encryptionType = "WPA2",
+                onLossFocus = {}
             )
         }
     }

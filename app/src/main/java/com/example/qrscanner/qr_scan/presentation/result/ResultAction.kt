@@ -6,4 +6,6 @@ sealed interface ResultAction {
 
     data class OnClickLink(val link: String) : ResultAction
 
+    data class OnLossFocus(val title: String) : ResultAction
+
 }

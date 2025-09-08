@@ -1,6 +1,6 @@
 package com.example.qrscanner.app.presentation.navigation
 
-import com.example.qrscanner.qr_scan.domain.model.BarcodeType
+import com.example.qrscanner.core.domain.BarcodeType
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -11,7 +11,7 @@ sealed interface Routes {
 
     @Serializable
     data class Result(
-        val isPreview: Boolean = false,
+        val isGenerated: Boolean = false,
         val type: BarcodeType,
         val value: String
     ) : Routes

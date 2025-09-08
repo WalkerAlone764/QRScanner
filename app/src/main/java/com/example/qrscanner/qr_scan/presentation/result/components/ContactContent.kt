@@ -26,7 +26,8 @@ import com.example.qrscanner.R
 fun ColumnScope.ContactContent(
     name: String,
     email: String,
-    phone: String
+    phone: String,
+    onLossFocus: (String) -> Unit
 ) {
     val context = LocalContext.current
     var isFocus by remember {
@@ -76,6 +77,9 @@ fun ColumnScope.ContactContent(
             .focusable(true)
             .onFocusChanged {
                 isFocus = it.isFocused
+                if (!it.isFocused) {
+                    onLossFocus(text.ifEmpty { "Contact" })
+                }
             }
 
 

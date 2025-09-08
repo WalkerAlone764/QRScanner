@@ -57,7 +57,7 @@ import androidx.lifecycle.withStarted
 import com.example.qrscanner.core.presentation.components.ContentWithBottomMessageBar
 import com.example.qrscanner.core.presentation.util.ObserveAsEvents
 import com.example.qrscanner.core.ui.theme.QRScannerTheme
-import com.example.qrscanner.qr_scan.domain.model.BarcodeType
+import com.example.qrscanner.core.domain.BarcodeType
 import com.example.qrscanner.qr_scan.presentation.scan.components.CameraRationale
 import com.example.qrscanner.qr_scan.presentation.scan.components.ErrorMessageDialog
 import kotlinx.coroutines.launch

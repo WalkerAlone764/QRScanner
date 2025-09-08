@@ -9,5 +9,4 @@ interface QRAnalysis {
 
     val result: SharedFlow<QRAnalysisResult>
 
-
 }

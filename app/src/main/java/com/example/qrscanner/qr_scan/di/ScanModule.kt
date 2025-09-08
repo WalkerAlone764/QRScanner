@@ -7,7 +7,7 @@ import com.example.qrscanner.qr_scan.presentation.scan.QRScanViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
-val appModule = module {
+val scanModule = module {
 
     single<QRAnalysis> {
         AndroidQRAnalysis(

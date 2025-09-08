@@ -3,6 +3,7 @@ package com.example.qrscanner.qr_scan.presentation.result.components
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
@@ -18,6 +19,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -27,7 +29,8 @@ import com.example.qrscanner.core.ui.theme.linkBackground
 @Composable
 fun ColumnScope.LinkContent(
     link: String,
-    onClickLink: () -> Unit
+    onClickLink: () -> Unit,
+    onLossFocus: (String) -> Unit
 ) {
 
     var isFocus by remember {
@@ -74,6 +77,14 @@ fun ColumnScope.LinkContent(
             }
         },
         modifier = Modifier
+            .focusable(true)
+            .onFocusChanged {
+                isFocus = it.isFocused
+
+                if (!it.isFocused) {
+                    onLossFocus(text.ifEmpty { "Link" })
+                }
+            }
 
 
     )
@@ -106,7 +117,8 @@ private fun Preview() {
         ) {
             LinkContent(
                 link = "https://google.com",
-                onClickLink = {}
+                onClickLink = {},
+                onLossFocus = {}
             )
         }
 

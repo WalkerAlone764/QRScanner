@@ -50,7 +50,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.qrscanner.R
 import com.example.qrscanner.core.presentation.util.ObserveAsEvents
 import com.example.qrscanner.core.ui.theme.QRScannerTheme
-import com.example.qrscanner.qr_scan.domain.model.BarcodeType
+import com.example.qrscanner.core.domain.BarcodeType
 import com.example.qrscanner.qr_scan.presentation.result.components.ContactContent
 import com.example.qrscanner.qr_scan.presentation.result.components.CopyShareRow
 import com.example.qrscanner.qr_scan.presentation.result.components.GeoContent
@@ -194,6 +194,9 @@ fun ResultScreen(
                                             state.linkResultWrapper?.url ?: ""
                                         )
                                     )
+                                },
+                                onLossFocus = {
+                                    onAction(ResultAction.OnLossFocus(it))
                                 }
                             )
                         }
@@ -202,20 +205,29 @@ fun ResultScreen(
                             ContactContent(
                                 name = state.contactResultWrapper?.formattedName ?: "",
                                 email = state.contactResultWrapper?.email ?: "",
-                                phone = state.contactResultWrapper?.phone ?: ""
+                                phone = state.contactResultWrapper?.phone ?: "",
+                                onLossFocus = {
+                                    onAction(ResultAction.OnLossFocus(it))
+                                }
                             )
                         }
 
                         BarcodeType.PHONE_NUMBER -> {
                             PhoneContent(
-                                number = state.phoneResultWrapper?.phone ?: ""
+                                number = state.phoneResultWrapper?.phone ?: "",
+                                onLossFocus = {
+                                    onAction(ResultAction.OnLossFocus(it))
+                                }
                             )
                         }
 
-                        BarcodeType.GEOLOCATION -> {
+                        BarcodeType.GEO_LOCATION -> {
                             GeoContent(
                                 latitude = state.geolocationResultWrapper?.lat.toString(),
-                                longitude = state.geolocationResultWrapper?.long.toString()
+                                longitude = state.geolocationResultWrapper?.long.toString(),
+                                onLossFocus = {
+                                    onAction(ResultAction.OnLossFocus(it))
+                                }
                             )
                         }
 
@@ -223,13 +235,19 @@ fun ResultScreen(
                             WifiContent(
                                 ssid = state.wifiResultWrapper?.ssid ?: "",
                                 password = state.wifiResultWrapper?.password ?: "",
-                                encryptionType = state.wifiResultWrapper?.encryption ?: ""
+                                encryptionType = state.wifiResultWrapper?.encryption ?: "",
+                                onLossFocus = {
+                                    onAction(ResultAction.OnLossFocus(it))
+                                }
                             )
                         }
 
                         BarcodeType.TEXT -> {
                             TextContent(
                                 text = state.textResultWrapper?.text ?: "",
+                                onLossFocus = {
+                                    onAction(ResultAction.OnLossFocus(it))
+                                }
                             )
                         }
                     }

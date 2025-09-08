@@ -18,6 +18,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.example.qrscanner.app.presentation.navigation.Routes
 import com.example.qrscanner.app.presentation.navigation.currentRoute
+import com.example.qrscanner.core.domain.BarcodeType
 import com.example.qrscanner.core.presentation.components.CustomNavBar
 import com.example.qrscanner.createqr.presentation.contactqr.ContactQRCreationRoot
 import com.example.qrscanner.createqr.presentation.create.CreateRoot
@@ -33,7 +34,6 @@ import com.example.qrscanner.qr_scan.data.model.BarcodeLinkResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodePhoneResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodeTextResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodeWifiResultWrapper
-import com.example.qrscanner.qr_scan.domain.model.BarcodeType
 import com.example.qrscanner.qr_scan.presentation.result.ResultRoot
 import com.example.qrscanner.qr_scan.presentation.scan.QRScanRoot
 import kotlinx.serialization.json.Json
@@ -167,7 +167,7 @@ fun SetupNavigation(
                     onNavigateToPreviewScreen = { number ->
                         navController.navigate(
                             Routes.Result(
-                                isPreview = true,
+                                isGenerated = true,
                                 type = BarcodeType.PHONE_NUMBER,
                                 value = Json.encodeToString(
                                     BarcodePhoneResultWrapper(
@@ -189,8 +189,8 @@ fun SetupNavigation(
                     onNavigateToPreviewScreen = { lat, long ->
                         navController.navigate(
                             Routes.Result(
-                                isPreview = true,
-                                type = BarcodeType.GEOLOCATION,
+                                isGenerated = true,
+                                type = BarcodeType.GEO_LOCATION,
                                 value = Json.encodeToString(
                                     BarcodeGeolocationResultWrapper(
                                         lat = lat.toDoubleOrNull(),
@@ -210,7 +210,7 @@ fun SetupNavigation(
                     onNavigateToPreviewScreen = { ssid, password, encryptedType ->
                         navController.navigate(
                             Routes.Result(
-                                isPreview = true,
+                                isGenerated = true,
                                 type = BarcodeType.WIFI,
                                 value = Json.encodeToString(
                                     BarcodeWifiResultWrapper(

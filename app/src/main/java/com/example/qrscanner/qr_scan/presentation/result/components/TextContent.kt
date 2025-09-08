@@ -35,7 +35,8 @@ const val DEFAULT_MINIMUM_LINE = 6 // Adjust as needed
 
 @Composable
 fun ColumnScope.TextContent(
-    text: String
+    text: String,
+    onLossFocus: (String) -> Unit
 ) {
 
     val context = LocalContext.current
@@ -92,6 +93,9 @@ fun ColumnScope.TextContent(
             .focusable(true)
             .onFocusChanged {
                 isFocus = it.isFocused
+                if (!it.isFocused) {
+                    onLossFocus(text.ifEmpty { "Text" })
+                }
             }
     )
 
@@ -140,7 +144,8 @@ private fun Preview() {
                 .fillMaxWidth()
         ) {
             TextContent(
-                text = "Adipiscing ipsum lacinia tincidunt sed. In risus dui accumsan accumsan quam morbi nulla. Dictum justo metus auctor nunc quam id sed. Urna nisi gravida sed lobortis diam pretium. Adipiscing ipsum lacinia tincidunt sed. In risus dui accumsan accumsan quam morbi nulla. Dictum metus auctor nunc quam id sed. Urna nisi gravida sed lobortis diam pretium.Adipiscing ipsum lacinia tincidunt sed. In risus dui accumsan accumsan quam morbi nulla. Dictum justo metus auctor nunc quam id sed. Urna nisi gravida sed lobortis diam pretium. Adipiscing ipsum lacinia tincidunt sed. In risus dui accumsan accumsan quam morbi nulla. Dictum metus auctor nunc quam id sed. Urna nisi gravida sed lobortis diam pretium."
+                text = "Adipiscing ipsum lacinia tincidunt sed. In risus dui accumsan accumsan quam morbi nulla. Dictum justo metus auctor nunc quam id sed. Urna nisi gravida sed lobortis diam pretium. Adipiscing ipsum lacinia tincidunt sed. In risus dui accumsan accumsan quam morbi nulla. Dictum metus auctor nunc quam id sed. Urna nisi gravida sed lobortis diam pretium.Adipiscing ipsum lacinia tincidunt sed. In risus dui accumsan accumsan quam morbi nulla. Dictum justo metus auctor nunc quam id sed. Urna nisi gravida sed lobortis diam pretium. Adipiscing ipsum lacinia tincidunt sed. In risus dui accumsan accumsan quam morbi nulla. Dictum metus auctor nunc quam id sed. Urna nisi gravida sed lobortis diam pretium.",
+                onLossFocus = {}
             )
         }
     }

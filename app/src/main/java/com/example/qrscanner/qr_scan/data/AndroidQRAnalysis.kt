@@ -17,7 +17,7 @@ import com.example.qrscanner.qr_scan.data.model.BarcodePhoneResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodeTextResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodeWifiResultWrapper
 import com.example.qrscanner.qr_scan.domain.QRAnalysis
-import com.example.qrscanner.qr_scan.domain.model.BarcodeType
+import com.example.qrscanner.core.domain.BarcodeType
 import com.example.qrscanner.qr_scan.domain.model.QRAnalysisResult
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
@@ -44,6 +44,9 @@ class AndroidQRAnalysis(
     private val scope = CoroutineScope(Dispatchers.Main)
 
     private val _isLoading = MutableSharedFlow<Boolean>()
+
+
+
     override val isLoading: SharedFlow<Boolean>
         get() = _isLoading.asSharedFlow()
 
@@ -55,11 +58,11 @@ class AndroidQRAnalysis(
         .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
         .build()
 
-    private val scanner = BarcodeScanning.getClient(scannerOptions)
-
+    private var scanner = BarcodeScanning.getClient(scannerOptions)
 
     @OptIn(ExperimentalGetImage::class)
     override fun analyze(imageProxy: ImageProxy) {
+
         val mediaImage = imageProxy.image
 
         if (mediaImage != null) {
@@ -107,7 +110,7 @@ class AndroidQRAnalysis(
                                 Log.d("barcode type",valueType.toString())
                                 when (valueType) {
                                     Barcode.TYPE_GEO -> {
-                                        val type = BarcodeType.GEOLOCATION
+                                        val type = BarcodeType.GEO_LOCATION
                                         val geo = barcode.geoPoint
                                         val result = BarcodeGeolocationResultWrapper(
                                             lat = geo?.lat, long = geo?.lng

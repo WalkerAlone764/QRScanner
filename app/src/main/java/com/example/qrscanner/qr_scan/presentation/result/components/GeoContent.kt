@@ -28,7 +28,8 @@ import com.example.qrscanner.core.ui.theme.QRScannerTheme
 @Composable
 fun ColumnScope.GeoContent(
     latitude: String,
-    longitude: String
+    longitude: String,
+    onLossFocus: (String) -> Unit
 ) {
 
     val context = LocalContext.current
@@ -79,6 +80,9 @@ fun ColumnScope.GeoContent(
             .focusable(true)
             .onFocusChanged {
                 isFocus = it.isFocused
+                if (!it.isFocused) {
+                    onLossFocus(text.ifEmpty { "Geolocation" })
+                }
             }
     )
 
@@ -101,7 +105,8 @@ private fun Preview() {
         ) {
             GeoContent(
                 latitude = "48.423123123123",
-                longitude = "2.231312312312"
+                longitude = "2.231312312312",
+                onLossFocus = {}
             )
         }
     }

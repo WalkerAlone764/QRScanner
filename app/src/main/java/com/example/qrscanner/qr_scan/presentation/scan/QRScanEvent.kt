@@ -1,6 +1,6 @@
 package com.example.qrscanner.qr_scan.presentation.scan
 
-import com.example.qrscanner.qr_scan.domain.model.BarcodeType
+import com.example.qrscanner.core.domain.BarcodeType
 
 sealed interface QRScanEvent {
     data object OnCloseApp: QRScanEvent

@@ -2,18 +2,20 @@ package com.example.qrscanner.qr_scan.presentation.result
 
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.example.qrscanner.app.presentation.navigation.Routes
+import com.example.qrscanner.core.domain.qr.QRDataSource
 import com.example.qrscanner.qr_scan.data.model.BarcodeContactResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodeGeolocationResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodeLinkResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodePhoneResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodeTextResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodeWifiResultWrapper
-import com.example.qrscanner.qr_scan.domain.model.BarcodeType
+import com.example.qrscanner.core.domain.BarcodeType
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
 import kotlinx.coroutines.channels.Channel
@@ -25,15 +27,17 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import java.time.Instant
 
 class ResultViewModel(
-    saveStateHandle: SavedStateHandle
+    saveStateHandle: SavedStateHandle,
+    private val qrDataSource: QRDataSource
 ) : ViewModel() {
 
     val route = saveStateHandle.toRoute<Routes.Result>()
-
-
     private var hasLoadedInitialData = false
+
+    private var id = MutableStateFlow(0L)
 
     private val _state = MutableStateFlow(ResultState())
     val state = _state.onStart {
@@ -52,7 +56,7 @@ class ResultViewModel(
 
     init {
         val type = route.type
-        _state.update { it.copy(type = type, isPreview = route.isPreview) }
+        _state.update { it.copy(type = type, isPreview = route.isGenerated) }
         when (type) {
             BarcodeType.LINK -> {
                 val linkWrapper = Json.decodeFromString<BarcodeLinkResultWrapper>(route.value)
@@ -85,7 +89,7 @@ class ResultViewModel(
                 _state.update { it.copy(bitmap = qrBitmap, phoneResultWrapper = phoneWrapper) }
             }
 
-            BarcodeType.GEOLOCATION -> {
+            BarcodeType.GEO_LOCATION -> {
                 val geoWrapper = Json.decodeFromString<BarcodeGeolocationResultWrapper>(route.value)
                 val geoQRContent = "geo:${geoWrapper.lat},${geoWrapper.long}"
                 val qrBitmap = generateQR(text = geoQRContent)
@@ -114,9 +118,31 @@ class ResultViewModel(
             ResultAction.OnClickCopy -> onCopy()
             ResultAction.OnClickShare -> onShare()
             is ResultAction.OnClickLink -> onCLickLink(action.link)
+            is ResultAction.OnLossFocus -> updateQRDataToDB(action.title)
         }
     }
 
+    private fun updateQRDataToDB(
+        title: String
+    ) {
+        viewModelScope.launch {
+            val resultID = qrDataSource.insertQR(
+                com.example.qrscanner.core.domain.qr.QR(
+                    id = id.value,
+                    isScanned = route.isGenerated,
+                    type = route.type,
+                    title = title,
+                    value = route.value,
+                    createdAt = Instant.now()
+                )
+            )
+
+            Log.d("result", resultID.toString())
+            if (resultID > 0) {
+                id.update { resultID }
+            }
+        }
+    }
     private fun onCLickLink(link: String) {
         viewModelScope.launch {
             _event.send(
@@ -156,7 +182,7 @@ class ResultViewModel(
             BarcodeType.LINK -> _state.value.linkResultWrapper?.url ?: ""
             BarcodeType.CONTACT -> "${_state.value.contactResultWrapper?.formattedName ?: ""} ${_state.value.contactResultWrapper?.phone ?: ""} ${_state.value.contactResultWrapper?.email ?: ""}"
             BarcodeType.PHONE_NUMBER -> _state.value.phoneResultWrapper?.phone ?: ""
-            BarcodeType.GEOLOCATION -> "${_state.value.geolocationResultWrapper?.lat ?: ""} ${_state.value.geolocationResultWrapper?.long ?: ""}"
+            BarcodeType.GEO_LOCATION -> "${_state.value.geolocationResultWrapper?.lat ?: ""} ${_state.value.geolocationResultWrapper?.long ?: ""}"
             BarcodeType.WIFI -> "SSID: ${_state.value.wifiResultWrapper?.ssid ?: ""}\nPassword: ${_state.value.wifiResultWrapper?.password ?: ""}\nEncryption type: ${_state.value.wifiResultWrapper?.encryption ?: ""}"
             BarcodeType.TEXT -> _state.value.textResultWrapper?.text ?: ""
         }

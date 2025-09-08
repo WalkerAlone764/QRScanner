@@ -7,7 +7,7 @@ import com.example.qrscanner.qr_scan.data.model.BarcodeLinkResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodePhoneResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodeTextResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodeWifiResultWrapper
-import com.example.qrscanner.qr_scan.domain.model.BarcodeType
+import com.example.qrscanner.core.domain.BarcodeType
 
 data class ResultState(
     val isPreview: Boolean = false,

@@ -28,7 +28,8 @@ import com.example.qrscanner.core.ui.theme.QRScannerTheme
 
 @Composable
 fun ColumnScope.PhoneContent(
-    number: String
+    number: String,
+    onLossFocus: (String) -> Unit
 ) {
     val context = LocalContext.current
     var isFocus by remember {
@@ -78,6 +79,9 @@ fun ColumnScope.PhoneContent(
             .focusable(true)
             .onFocusChanged {
                 isFocus = it.isFocused
+                if (!it.isFocused) {
+                    onLossFocus(text.ifEmpty { "Phone Number" })
+                }
             }
     )
 
@@ -101,7 +105,8 @@ private fun Preview() {
             modifier = Modifier.background(MaterialTheme.colorScheme.surface)
         ) {
             PhoneContent(
-                number = "+1 123 456 7890"
+                number = "+1 123 456 7890",
+                onLossFocus = {}
             )
         }
     }

@@ -3,6 +3,7 @@ package com.example.qrscanner.qr_scan.presentation.result
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -196,6 +197,7 @@ fun ResultScreen(
                                     )
                                 },
                                 onLossFocus = {
+                                    Log.d("updating", it)
                                     onAction(ResultAction.OnLossFocus(it))
                                 }
                             )
@@ -246,10 +248,13 @@ fun ResultScreen(
                             TextContent(
                                 text = state.textResultWrapper?.text ?: "",
                                 onLossFocus = {
+                                    println("i am calling $it")
                                     onAction(ResultAction.OnLossFocus(it))
                                 }
                             )
                         }
+
+                        else -> Unit
                     }
 
                     Spacer(modifier = Modifier.height(14.dp))

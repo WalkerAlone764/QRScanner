@@ -129,7 +129,7 @@ class ResultViewModel(
             val resultID = qrDataSource.insertQR(
                 com.example.qrscanner.core.domain.qr.QR(
                     id = id.value,
-                    isScanned = route.isGenerated,
+                    isScanned = !route.isGenerated,
                     type = route.type,
                     title = title,
                     value = route.value,
@@ -185,6 +185,7 @@ class ResultViewModel(
             BarcodeType.GEO_LOCATION -> "${_state.value.geolocationResultWrapper?.lat ?: ""} ${_state.value.geolocationResultWrapper?.long ?: ""}"
             BarcodeType.WIFI -> "SSID: ${_state.value.wifiResultWrapper?.ssid ?: ""}\nPassword: ${_state.value.wifiResultWrapper?.password ?: ""}\nEncryption type: ${_state.value.wifiResultWrapper?.encryption ?: ""}"
             BarcodeType.TEXT -> _state.value.textResultWrapper?.text ?: ""
+            else -> throw IllegalArgumentException("Invalid type")
         }
     }
 

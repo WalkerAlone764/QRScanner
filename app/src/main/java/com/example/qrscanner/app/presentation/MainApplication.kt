@@ -2,6 +2,7 @@ package com.example.qrscanner.app.presentation
 
 import android.app.Application
 import com.example.qrscanner.core.di.coreModule
+import com.example.qrscanner.history.di.historyModule
 import com.example.qrscanner.qr_scan.di.scanModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -14,7 +15,7 @@ class MainApplication : Application() {
         startKoin {
             androidLogger()
             androidContext(this@MainApplication)
-            modules(scanModule, coreModule)
+            modules(scanModule, coreModule, historyModule)
         }
     }
 }

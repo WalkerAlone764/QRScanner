@@ -9,8 +9,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,7 +21,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -38,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.qrscanner.core.ui.theme.QRScannerTheme
 import com.example.qrscanner.core.util.copy
+import com.example.qrscanner.history.presentation.components.HistoryItem
 import com.example.qrscanner.history.presentation.components.SelectableTabItem
 import com.example.qrscanner.history.presentation.components.TabRow
 import kotlinx.coroutines.launch
@@ -162,20 +164,36 @@ fun HistoryScreen(
                         .fillMaxSize()
                 ) { value ->
                     if (value == SelectableTabItem.Generated) {
-                        LazyColumn(modifier = Modifier.fillMaxSize()) { // ensure LazyColumn fills size
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(
+                                    horizontal = 12.dp
+                                ),
+                            contentPadding = PaddingValues(
+                                horizontal = 12.dp
+                            ),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) { // ensure LazyColumn fills size
                             items(state.generatedQRs) { item ->
-                                Text(
-                                    text = "Generated ${item.title}", // Changed from Scanned
-                                    color = Color.Black
+                                HistoryItem(
+                                    item = item
                                 )
                             }
                         }
                     } else {
-                        LazyColumn(modifier = Modifier.fillMaxSize()) { // ensure LazyColumn fills size
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            contentPadding = PaddingValues(
+                                horizontal = 24.dp,
+                                vertical = 12.dp
+                            ),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) { // ensure LazyColumn fills size
                             items(state.scannedQRs) { item ->
-                                Text(
-                                    text = "Scanned ${item.title}",
-                                    color = Color.Black
+                                HistoryItem(
+                                    item = item
                                 )
                             }
                         }
@@ -192,12 +210,12 @@ fun HistoryScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(with(density) { bottomTabHeight.toDp() })
+                    .height(with(density) { bottomTabHeight.toDp() + 20.dp })
                     .background(
                         brush = Brush.verticalGradient(
                             colorStops = arrayOf(
-                                0.3f to Color.Transparent,
-                                0.7f to Color.White.copy(0.4f),
+                                0.2f to Color.Transparent,
+                                0.8f to Color.White.copy(0.8f),
                             )
                         )
                     )

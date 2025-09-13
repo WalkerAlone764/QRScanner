@@ -1,6 +1,6 @@
 package com.example.qrscanner.core.presentation.components
 
-import androidx.compose.foundation.background
+    import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -48,10 +49,12 @@ fun CustomNavBar(
 
     Row(
         modifier = modifier
-            .navigationBarsPadding()
-            .padding(
-                bottom = 12.dp
+            .offset(
+                y = (-20).dp
             )
+            .navigationBarsPadding()
+
+            .shadow(0.4.dp, RoundedCornerShape(50), clip = false)
             .background(Color.White, RoundedCornerShape(50)),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {

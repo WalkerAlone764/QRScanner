@@ -94,7 +94,7 @@ fun ColumnScope.TextContent(
             .onFocusChanged {
                 isFocus = it.isFocused
                 if (!it.isFocused) {
-                    onLossFocus(text.ifEmpty { "Text" })
+                    onLossFocus(title.ifEmpty { "Text" })
                 }
             }
     )

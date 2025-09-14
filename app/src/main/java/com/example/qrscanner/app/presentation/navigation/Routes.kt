@@ -11,6 +11,7 @@ sealed interface Routes {
 
     @Serializable
     data class Result(
+        val id: Long = 0,
         val isGenerated: Boolean = false,
         val type: BarcodeType,
         val value: String

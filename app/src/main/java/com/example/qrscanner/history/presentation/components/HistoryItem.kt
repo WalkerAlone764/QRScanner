@@ -2,6 +2,7 @@ package com.example.qrscanner.history.presentation.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,6 +49,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun HistoryItem(
     item: QR,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val dateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm")
@@ -58,6 +60,9 @@ fun HistoryItem(
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .background(Color.White, RoundedCornerShape(16.dp))
+            .clickable {
+                onClick()
+            }
             .padding(16.dp)
     ) {
         Row(
@@ -239,7 +244,8 @@ private fun PreviewHistoryItemText() {
                 value = "Adipiscing ipsum lacinia tincidunt sed. In risus dui accumsan accumsan quam morbi nulla. Dictum...",
                 type = TEXT,
                 createdAt = Instant.parse("2025-06-24T14:36:00Z")
-            )
+            ),
+            onClick = {}
         )
     }
 }
@@ -255,7 +261,8 @@ private fun PreviewHistoryItemLink() {
                 value = "https://www.google.com/search?q=jetpack+compose+preview+background+color&oq=jetpack+compose+preview+background+color&aqs=chrome..69i57j0i22i30l9.1337j0j7&sourceid=chrome&ie=UTF-8",
                 type = LINK,
                 createdAt = Instant.now()
-            )
+            ),
+            onClick = {}
         )
     }
 }
@@ -271,7 +278,8 @@ private fun PreviewHistoryItemGeo() {
                 value = "geo:37.7749,-122.4194?q=Golden Gate Bridge",
                 type = GEO_LOCATION,
                 createdAt = Instant.now().minusSeconds(86400 * 5) // 5 days ago
-            )
+            ),
+            onClick = {}
         )
     }
 }

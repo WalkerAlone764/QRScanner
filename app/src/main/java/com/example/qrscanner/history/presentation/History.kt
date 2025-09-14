@@ -37,6 +37,8 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.qrscanner.core.domain.qr.QR
+import com.example.qrscanner.core.presentation.util.ObserveAsEvents
 import com.example.qrscanner.core.ui.theme.QRScannerTheme
 import com.example.qrscanner.core.util.copy
 import com.example.qrscanner.history.presentation.components.HistoryItem
@@ -47,9 +49,16 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun HistoryRoot(
+    onNavigateToResult: (qr: QR) -> Unit,
     viewModel: HistoryViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+
+    ObserveAsEvents(viewModel.event) { event ->
+        when (event) {
+            is HistoryEvent.OnClickCard -> onNavigateToResult(event.qr)
+        }
+    }
 
     HistoryScreen(
         state = state,
@@ -166,18 +175,19 @@ fun HistoryScreen(
                     if (value == SelectableTabItem.Generated) {
                         LazyColumn(
                             modifier = Modifier
-                                .fillMaxSize()
-                                .padding(
-                                    horizontal = 12.dp
-                                ),
+                                .fillMaxSize(),
                             contentPadding = PaddingValues(
-                                horizontal = 12.dp
+                                horizontal = 24.dp,
+                                vertical = 12.dp
                             ),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) { // ensure LazyColumn fills size
                             items(state.generatedQRs) { item ->
                                 HistoryItem(
-                                    item = item
+                                    item = item,
+                                    onClick = {
+                                        onAction(HistoryAction.OnClickCard(item))
+                                    }
                                 )
                             }
                         }
@@ -193,7 +203,10 @@ fun HistoryScreen(
                         ) { // ensure LazyColumn fills size
                             items(state.scannedQRs) { item ->
                                 HistoryItem(
-                                    item = item
+                                    item = item,
+                                    onClick = {
+                                        onAction(HistoryAction.OnClickCard(item))
+                                    }
                                 )
                             }
                         }
@@ -241,6 +254,8 @@ private fun Preview() {
                     is HistoryAction.OnTabSelected -> {
                         tabSelected = it.tabItem
                     }
+
+                    else -> Unit
                 }
             }
         )

@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.example.qrscanner.app.presentation.navigation.Routes
+import com.example.qrscanner.core.domain.BarcodeType
 import com.example.qrscanner.core.domain.qr.QRDataSource
 import com.example.qrscanner.qr_scan.data.model.BarcodeContactResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodeGeolocationResultWrapper
@@ -15,7 +16,6 @@ import com.example.qrscanner.qr_scan.data.model.BarcodeLinkResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodePhoneResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodeTextResultWrapper
 import com.example.qrscanner.qr_scan.data.model.BarcodeWifiResultWrapper
-import com.example.qrscanner.core.domain.BarcodeType
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
 import kotlinx.coroutines.channels.Channel
@@ -37,7 +37,7 @@ class ResultViewModel(
     val route = saveStateHandle.toRoute<Routes.Result>()
     private var hasLoadedInitialData = false
 
-    private var id = MutableStateFlow(0L)
+    private var id = MutableStateFlow(route.id)
 
     private val _state = MutableStateFlow(ResultState())
     val state = _state.onStart {
@@ -143,6 +143,7 @@ class ResultViewModel(
             }
         }
     }
+
     private fun onCLickLink(link: String) {
         viewModelScope.launch {
             _event.send(

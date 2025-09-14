@@ -63,7 +63,7 @@ fun SetupNavigation(
                 QRScanRoot(
                     onNavigateToResult = { type, value ->
                         navController.navigate(
-                            Routes.Result(false, type, value)
+                            Routes.Result(0L, false, type, value)
                         )
                     })
             }
@@ -91,7 +91,19 @@ fun SetupNavigation(
             }
 
             composable<Routes.History> {
-                HistoryRoot()
+                HistoryRoot(
+                    onNavigateToResult = {
+                        navController.navigate(
+                            Routes.Result(
+                                it.id ?: 0L,
+                                !it.isScanned,
+                                it.type,
+                                it.value
+
+                            )
+                        )
+                    }
+                )
             }
 
             composable<Routes.TextQR> {
@@ -103,6 +115,7 @@ fun SetupNavigation(
                     onNavigateToPreviewScreen = { text ->
                         navController.navigate(
                             Routes.Result(
+                                0L,
                                 true,
                                 BarcodeType.TEXT,
                                 Json.encodeToString(BarcodeTextResultWrapper(text))
@@ -121,6 +134,7 @@ fun SetupNavigation(
                     onNavigateToPreviewScreen = {
                         navController.navigate(
                             Routes.Result(
+                                0L,
                                 true,
                                 BarcodeType.LINK,
                                 Json.encodeToString(
@@ -144,6 +158,7 @@ fun SetupNavigation(
                     onNavigateToPreviewScreen = { name, email, phone ->
                         navController.navigate(
                             Routes.Result(
+                                0L,
                                 true,
                                 BarcodeType.CONTACT,
                                 Json.encodeToString(
